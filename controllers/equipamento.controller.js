@@ -67,6 +67,7 @@ function cadastrar(req, res){
     }
 }
 
+//a função atualizar esta dando errado porque ao inves de atualizar ela ta criando no banco de dados
 function atualizar(req, res){
     const id = req.params.id;
     const atualizarEquipamento = {
