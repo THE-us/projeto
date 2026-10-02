@@ -171,6 +171,6 @@ function index(req, res){
 module.exports = {
     cadastrar: cadastrar,
     atualizar: atualizar,
-    deletar: deletar,
-    index: index
+    deletar:     deletar,
+    index:         index
 }

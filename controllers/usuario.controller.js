@@ -112,4 +112,7 @@ function logIn(req, res){
     });
 }
 
-module.exports = {signUp, logIn};
+module.exports = {
+    signUp: signUp, 
+    logIn:   logIn
+};
