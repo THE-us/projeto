@@ -1,4 +1,4 @@
-const models =    require('../models');
+const models    =         require('../models');
 const Validator = require('fastest-validator');
 
 function cadastrar(req, res){

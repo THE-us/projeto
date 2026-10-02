@@ -9,10 +9,10 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Usuario.init({
-    login: DataTypes.STRING(30),
+    login:  DataTypes.STRING(30),
     senha: DataTypes.STRING(100),
-    nome: DataTypes.STRING(100),
-    ativo: DataTypes.TINYINT(1)
+    nome:  DataTypes.STRING(100),
+    ativo:  DataTypes.TINYINT(1)
   }, {
     sequelize,
     modelName: 'Usuario',

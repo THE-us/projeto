@@ -9,15 +9,15 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Fluxo.init({
-    seq: DataTypes.INTEGER,
-    data: DataTypes.DATEONLY,
-    hora: DataTypes.TIME,
-    placa: DataTypes.STRING(7),
-    velMed: DataTypes.SMALLINT,
-    tamVeic: DataTypes.SMALLINT,
-    classVeic: DataTypes.STRING(3),
-    pesoBt: DataTypes.INTEGER,
-    dataRecebimento: DataTypes.DATE,
+    seq:           DataTypes.INTEGER,
+    data:         DataTypes.DATEONLY,
+    hora:             DataTypes.TIME,
+    placa:       DataTypes.STRING(7),
+    velMed:       DataTypes.SMALLINT,
+    tamVeic:      DataTypes.SMALLINT,
+    classVeic:   DataTypes.STRING(3),
+    pesoBt:        DataTypes.INTEGER,
+    dataRecebimento:  DataTypes.DATE,
     equipamentoId: DataTypes.INTEGER
   }, {
     sequelize,

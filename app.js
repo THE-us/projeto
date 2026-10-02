@@ -1,10 +1,10 @@
 require('dotenv').config();
-const express = require('express');
-const bodyParser = require('body-parser');
+const express          =              require('express');
+const bodyParser       =          require('body-parser');
 
-const usuarioRoute = require('./routes/usuario');
-const integradorRoute = require('./routes/integrador');
-const municipioRoute = require('./routes/municipio');
+const usuarioRoute     =     require('./routes/usuario');
+const integradorRoute  =  require('./routes/integrador');
+const municipioRoute   =   require('./routes/municipio');
 const equipamentoRoute = require('./routes/equipamento');
 
 const app = express();

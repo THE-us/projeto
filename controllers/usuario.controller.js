@@ -1,14 +1,14 @@
-const models = require('../models');
-const bcryptjs = require('bcryptjs');
-const jwt = require('jsonwebtoken');
+const models    =         require('../models');
+const bcryptjs  =          require('bcryptjs');
+const jwt       =      require('jsonwebtoken');
 const Validator = require('fastest-validator');
-const { where } = require('sequelize');
+const { where } =         require('sequelize');
 
 function signUp(req, res){
     const schema = {
         login: {type: "string", optional: false, max: 30},
         senha: {type: "string", optional: false},
-        nome: {type: "string", optional: false, max: 100},
+        nome:  {type: "string", optional: false, max: 100},
         ativo: {type: "number", optional: false}
     }
 
@@ -33,7 +33,7 @@ function signUp(req, res){
                 const usuario = {
                     login: req.body.login,
                     senha: hash,
-                    nome: req.body.nome,
+                    nome:  req.body.nome,
                     ativo: req.body.ativo
                 }
 
