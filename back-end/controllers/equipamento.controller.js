@@ -116,7 +116,7 @@ function atualizar(req, res){
 
     models.Municipio.findByPk(req.body.municipioId).then(result => {
         if(result !== null){
-            models.Equipamento.create(atualizarEquipamento, {where: {id: id}}).then(result => {
+            models.Equipamento.update(atualizarEquipamento, {where: {id: id}}).then(result => {
                 res.status(201).json({
                     message: "EQUIPAMENTO ATUALIZADO COM SUCESSO",
                     post: result
@@ -159,18 +159,54 @@ function deletar(req, res){
 }
 
 function index(req, res){
-    models.Equipamento.findAll().then(result => {
-        res.status(200).json(result);
-    }).catch(error => {
-        res.status(500).json({
-            message: "ERRO EM PEGAR TODOS OS EQUIPAMENTOS"
+    const where = {};
+
+    if(req.query.codigo) where.codigo = req.query.codigo;
+    if(req.query.faixa) where.faixa = req.query.faixa;
+    if(req.query.ativo !== undefined) where.ativo = req.query.ativo;
+    if(req.query.integradorId) where.integradorId = req.query.integradorId;
+
+    models.Equipamento.findAll({
+            where: where,
+            include: [
+                { model: models.Integrador, attributes: ['id', 'nome'] },
+                { model: models.Municipio, attributes: ['id', 'descricao', 'uf'] }
+            ]
+        }).then(result => {
+            res.status(200).json(result);
+        }).catch(error => {
+            res.status(500).json({ message: "ERRO EM PEGAR TODOS OS EQUIPAMENTOS" });
         });
-    })
+}
+
+function buscarPorId(req, res){
+    const id = req.params.id;
+
+    models.Equipamento.findByPk(id, {
+        include: [
+            {model: models.Integrador, attributes: ['id', 'nome']},
+            {model: models.Municipio, attributes: ['id', 'descricao', 'uf']}
+        ]
+    }).then(result => {
+        if(!result){
+            return res.status(404).json({
+                message: "EQUIPAMENTO NAO ENCONTRADO"
+            });
+        }
+
+        return res.status(200).json(result);
+    }).catch(error => {
+        return res.status(500).json({
+            message: "ERRO AO BUSCAR EQUIPAMENTO",
+            error: error
+        });
+    });
 }
 
 module.exports = {
-    cadastrar: cadastrar,
-    atualizar: atualizar,
-    deletar:     deletar,
-    index:         index
+    cadastrar:     cadastrar,
+    atualizar:     atualizar,
+    deletar:         deletar,
+    index:             index,
+    buscarPorId: buscarPorId
 }

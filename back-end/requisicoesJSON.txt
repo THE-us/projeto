@@ -1,0 +1,79 @@
+USUARIO
+
+POST /usuario/signUp - sem token
+body:
+{
+"login": "teste",
+"senha": "123456",
+"nome": "Usuario Teste",
+"ativo": 1
+}
+
+POST /usuario/login - sem token
+body:
+{
+"login": "teste",
+"senha": "123456"
+}
+
+INTEGRADOR
+
+GET /integrador - com token
+
+MUNICIPIO
+
+GET /municipio - com token
+
+EQUIPAMENTO
+
+GET /equipamento - com token
+
+GET /equipamento/16 - com token
+
+POST /equipamento - com token
+body:
+{
+"codigo": "2300999",
+"faixa": 1,
+"tipo": "REV",
+"ativo": 1,
+"local": "BR 101/BA Km 10+500m",
+"marca": "CONSILUX",
+"modelo": "CSC II",
+"velocidadeLimite": 60,
+"dataAfericao": "2025-01-01",
+"lacre": "H1234567-0",
+"dataRegistroInmetro": null,
+"numeroInmetro": null,
+"integradorId": 1,
+"municipioId": 3825
+}
+
+PATCH /equipamento/16 - com token
+body:
+{
+"codigo": "2300203",
+"faixa": 1,
+"tipo": "REV",
+"ativo": 0,
+"local": "BR 135/BA Km 78+430m",
+"marca": "CONSILUX",
+"modelo": "CSC II",
+"velocidadeLimite": 50,
+"dataAfericao": "2025-02-11",
+"lacre": "H2751865-0",
+"dataRegistroInmetro": null,
+"numeroInmetro": null,
+"integradorId": 1,
+"municipioId": 3825
+}
+
+DELETE /equipamento/999 - com token
+
+FLUXO
+
+GET /fluxo/pesquisar?dataInicio=2025-03-01&dataFim=2025-03-31 - com token
+
+GET /fluxo/analisar - com token
+
+GET /fluxo/analisar?dataInicio=2025-03-01&dataFim=2025-03-31 - com token

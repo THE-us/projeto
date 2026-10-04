@@ -7,6 +7,7 @@ const router = express.Router();
 router.post("/", checkAuth.checkAuth, equipamentoController.cadastrar);
 router.patch("/:id", checkAuth.checkAuth, equipamentoController.atualizar);
 router.delete("/:id", checkAuth.checkAuth, equipamentoController.deletar);
-router.get("/", equipamentoController.index);
+router.get("/", checkAuth.checkAuth, equipamentoController.index);
+router.get("/:id", checkAuth.checkAuth, equipamentoController.buscarPorId);
 
 module.exports = router;
