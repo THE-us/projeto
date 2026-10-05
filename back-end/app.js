@@ -1,4 +1,5 @@
 require('dotenv').config();
+const cors             =                 require('cors');
 const express          =              require('express');
 const bodyParser       =          require('body-parser');
 
@@ -9,6 +10,10 @@ const equipamentoRoute = require('./routes/equipamento');
 const fluxoRoute = require('./routes/fluxo');
 
 const app = express();
+
+app.use(cors({
+    origin: 'http://localhost:4200'
+}));
 
 app.use(bodyParser.json());
 
