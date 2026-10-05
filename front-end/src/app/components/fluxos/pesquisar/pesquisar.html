@@ -1,0 +1,60 @@
+<div>
+  <h2>Pesquisar Fluxos</h2>
+
+  <div>
+    <div>
+      <label>Data Início</label>
+      <input type="date" [(ngModel)]="filtros.dataInicio" name="dataInicio" />
+    </div>
+    <div>
+      <label>Data Fim</label>
+      <input type="date" [(ngModel)]="filtros.dataFim" name="dataFim" />
+    </div>
+    <div>
+      <label>Hora Início</label>
+      <input type="time" [(ngModel)]="filtros.horaInicio" name="horaInicio" />
+    </div>
+    <div>
+      <label>Hora Fim</label>
+      <input type="time" [(ngModel)]="filtros.horaFim" name="horaFim" />
+    </div>
+    <div>
+      <label>Placa</label>
+      <input type="text" [(ngModel)]="filtros.placa" name="placa" />
+    </div>
+    <div>
+      <label>Código do Equipamento</label>
+      <input type="text" [(ngModel)]="filtros.equipamentoId" name="equipamentoId" />
+    </div>
+    <button (click)="pesquisar()">Pesquisar</button>
+  </div>
+
+  <div *ngIf="erro">{{ erro }}</div>
+
+  <table *ngIf="pesquisado && fluxos.length > 0">
+    <thead>
+      <tr>
+        <th>Data</th>
+        <th>Hora</th>
+        <th>Placa</th>
+        <th>Vel. Média</th>
+        <th>Tam. Veíc.</th>
+        <th>Classe</th>
+        <th>Equipamento</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let f of fluxos">
+        <td>{{ f.data }}</td>
+        <td>{{ f.hora }}</td>
+        <td>{{ f.placa }}</td>
+        <td>{{ f.velMed }}</td>
+        <td>{{ f.tamVeic }}</td>
+        <td>{{ f.classVeic }}</td>
+        <td>{{ f.Equipamento?.codigo }} - {{ f.Equipamento?.faixa }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div *ngIf="pesquisado && fluxos.length === 0 && !erro">Nenhum resultado encontrado.</div>
+</div>

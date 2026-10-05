@@ -1,0 +1,48 @@
+<div>
+  <h2>Equipamentos</h2>
+
+  <div>
+    <input type="text" [(ngModel)]="filtros.codigo" name="codigo" placeholder="Código" />
+    <input type="number" [(ngModel)]="filtros.faixa" name="faixa" placeholder="Faixa" />
+    <select [(ngModel)]="filtros.ativo" name="ativo">
+      <option value="">Todos</option>
+      <option value="1">Ativo</option>
+      <option value="0">Inativo</option>
+    </select>
+    <select [(ngModel)]="filtros.integradorId" name="integradorId">
+      <option value="">Todos os integradores</option>
+      <option *ngFor="let i of integradores" [value]="i.id">{{ i.nome }}</option>
+    </select>
+    <button (click)="pesquisar()">Pesquisar</button>
+    <button (click)="cadastrar()">Novo Equipamento</button>
+  </div>
+
+  <div *ngIf="erro">{{ erro }}</div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Código</th>
+        <th>Faixa</th>
+        <th>Tipo</th>
+        <th>Ativo</th>
+        <th>Local</th>
+        <th>Integrador</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let e of equipamentos">
+        <td>{{ e.codigo }}</td>
+        <td>{{ e.faixa }}</td>
+        <td>{{ e.tipo }}</td>
+        <td>{{ e.ativo === 1 ? 'Sim' : 'Não' }}</td>
+        <td>{{ e.local }}</td>
+        <td>{{ e.Integrador?.nome }}</td>
+        <td>
+          <button (click)="atualizar(e.id)">Editar</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

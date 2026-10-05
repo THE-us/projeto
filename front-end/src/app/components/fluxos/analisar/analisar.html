@@ -1,0 +1,36 @@
+<div>
+  <h2>Análise de Fluxos</h2>
+
+  <div>
+    <div>
+      <label>Data Início</label>
+      <input type="date" [(ngModel)]="filtros.dataInicio" name="dataInicio" />
+    </div>
+    <div>
+      <label>Data Fim</label>
+      <input type="date" [(ngModel)]="filtros.dataFim" name="dataFim" />
+    </div>
+    <button (click)="analisar()">Filtrar</button>
+  </div>
+
+  <div *ngIf="erro">{{ erro }}</div>
+
+  <table *ngIf="fluxos.length > 0">
+    <thead>
+      <tr>
+        <th>Equipamento</th>
+        <th>Faixa</th>
+        <th>Total de Fluxos</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let f of fluxos">
+        <td>{{ f.Equipamento?.codigo }}</td>
+        <td>{{ f.Equipamento?.faixa }}</td>
+        <td>{{ f.totalFluxos }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div *ngIf="fluxos.length === 0 && !erro">Nenhum resultado encontrado.</div>
+</div>

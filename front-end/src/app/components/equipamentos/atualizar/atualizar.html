@@ -1,0 +1,82 @@
+<div>
+  <h2>Atualizar Equipamento</h2>
+
+  <div *ngIf="erro">{{ erro }}</div>
+
+  <form (ngSubmit)="onSubmit()">
+    <div>
+      <label>Código</label>
+      <input type="text" [(ngModel)]="equipamento.codigo" name="codigo" required />
+    </div>
+    <div>
+      <label>Faixa</label>
+      <input type="number" [(ngModel)]="equipamento.faixa" name="faixa" required />
+    </div>
+    <div>
+      <label>Tipo</label>
+      <select [(ngModel)]="equipamento.tipo" name="tipo" required>
+        <option value="">Selecione</option>
+        <option value="REV">REV</option>
+        <option value="CEV">CEV</option>
+        <option value="CEM">CEM</option>
+      </select>
+    </div>
+    <div>
+      <label>Ativo</label>
+      <select [(ngModel)]="equipamento.ativo" name="ativo" required>
+        <option value="">Selecione</option>
+        <option [value]="1">Sim</option>
+        <option [value]="0">Não</option>
+      </select>
+    </div>
+    <div>
+      <label>Local</label>
+      <input type="text" [(ngModel)]="equipamento.local" name="local" required />
+    </div>
+    <div>
+      <label>Marca</label>
+      <input type="text" [(ngModel)]="equipamento.marca" name="marca" required />
+    </div>
+    <div>
+      <label>Modelo</label>
+      <input type="text" [(ngModel)]="equipamento.modelo" name="modelo" required />
+    </div>
+    <div>
+      <label>Velocidade Limite</label>
+      <input type="number" [(ngModel)]="equipamento.velocidadeLimite" name="velocidadeLimite" required />
+    </div>
+    <div>
+      <label>Data Aferição</label>
+      <input type="date" [(ngModel)]="equipamento.dataAfericao" name="dataAfericao" required />
+    </div>
+    <div>
+      <label>Lacre</label>
+      <input type="text" [(ngModel)]="equipamento.lacre" name="lacre" required />
+    </div>
+    <div>
+      <label>Data Registro Inmetro</label>
+      <input type="date" [(ngModel)]="equipamento.dataRegistroInmetro" name="dataRegistroInmetro" />
+    </div>
+    <div>
+      <label>Número Inmetro</label>
+      <input type="text" [(ngModel)]="equipamento.numeroInmetro" name="numeroInmetro" />
+    </div>
+    <div>
+      <label>Integrador</label>
+      <select [(ngModel)]="equipamento.integradorId" name="integradorId" required>
+        <option value="">Selecione</option>
+        <option *ngFor="let i of integradores" [value]="i.id">{{ i.nome }}</option>
+      </select>
+    </div>
+    <div>
+      <label>Município</label>
+      <select [(ngModel)]="equipamento.municipioId" name="municipioId" required>
+        <option value="">Selecione</option>
+        <option *ngFor="let m of municipios" [value]="m.id">{{ m.descricao }} - {{ m.uf }}</option>
+      </select>
+    </div>
+    <button type="submit">Atualizar</button>
+    <button type="button" (click)="deletar()">Excluir</button>
+    <button type="button" (click)="voltar()">Voltar</button>
+  </form>
+</div>

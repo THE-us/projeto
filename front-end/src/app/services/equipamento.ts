@@ -12,8 +12,15 @@ export class EquipamentoService {
 
   constructor(private http: HttpClient) {}
 
-  listar(): Observable<any> {
-    return this.http.get(this.apiUrl);
+  listar(filtros?: any): Observable<any> {
+    let params = new HttpParams();
+
+    if (filtros?.codigo) params = params.set('codigo', filtros.codigo);
+    if (filtros?.faixa) params = params.set('faixa', filtros.faixa);
+    if (filtros?.ativo !== undefined && filtros?.ativo !== '') params = params.set('ativo', filtros.ativo);
+    if (filtros?.integradorId) params = params.set('integradorId', filtros.integradorId);
+
+    return this.http.get(this.apiUrl, { params });
   }
 
   buscarPorId(id: number): Observable<any> {
