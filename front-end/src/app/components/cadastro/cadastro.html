@@ -1,0 +1,23 @@
+<div>
+  <h2>Cadastro</h2>
+
+  <div *ngIf="erro">{{ erro }}</div>
+  <div *ngIf="sucesso">{{ sucesso }}</div>
+
+  <form (ngSubmit)="onSubmit()">
+    <div>
+      <label>Nome</label>
+      <input type="text" [(ngModel)]="nome" name="nome" required />
+    </div>
+    <div>
+      <label>Login</label>
+      <input type="text" [(ngModel)]="login" name="login" required />
+    </div>
+    <div>
+      <label>Senha</label>
+      <input type="password" [(ngModel)]="senha" name="senha" required />
+    </div>
+    <button type="submit">Cadastrar</button>
+    <a routerLink="/login">Já tenho login</a>
+  </form>
+</div>
