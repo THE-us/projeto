@@ -1,15 +1,13 @@
-const models = require('../models');
+'use strict';
+const { router, wrapAsync, sqFilter, findAll } = require('../bases/base-controller');
+const IntegradorService = require('../services/app/integrador.service');
 
-function index(req, res){
-    models.Integrador.findAll().then(result => {
-        res.status(200).json(result);
-    }).catch(error => {
-        res.status(500).json({
-            message: "ERROR EM BUSCAR OS INTEGRADORES"
-        });
+router.get(
+    '/',
+    sqFilter(),
+    wrapAsync(async (req, res) => {
+        await findAll(req, res, IntegradorService);
     })
-}
+);
 
-module.exports = {
-    index: index
-}
+module.exports = router;
