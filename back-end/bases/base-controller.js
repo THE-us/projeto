@@ -3,6 +3,7 @@ const express = require('express');
 const wrapAsync = require('../util/wrap.async');
 const Response = require('../util/response');
 const Validations = require('../util/validations');
+const sqFilter = require('@isatech/express-sequelize-query-filter');
 
 module.exports = () => {
     const router = express.Router();
@@ -37,6 +38,7 @@ module.exports = () => {
         wrapAsync,
         findAll,
         create,
+        sqFilter,
         deletedById,
 
         ...Validations,

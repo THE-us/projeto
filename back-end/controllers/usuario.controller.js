@@ -100,7 +100,7 @@ router.put(
 
 router.delete(
     '/:id',
-    validateParamIdAsIntAndSanitizes(),
+    validateParamIdAsIntAndSanitize(),
     wrapAsync(async (req, res) => {
         await deleteById(req, res, UsuarioService, req.user.perfil);
     })
