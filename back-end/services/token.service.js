@@ -1,5 +1,5 @@
 'use strict';
-const config = require('../config/config.json');
+const config = require('../config/config');
 const jwt = require('jsonwebtoken');
 
 class TokenService{

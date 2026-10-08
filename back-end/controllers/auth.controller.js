@@ -1,6 +1,7 @@
 'use strict';
 
 const authService = require('../services/auth.service');
+const config = require('../config/config')
 
 const { router, Response, wrapAsync, validateSchema, getSchema, matchedBody } = require('../bases/base-controller')();
 
@@ -35,7 +36,7 @@ const refreshSchema = {
 
 router.post(
     '/login',
-    validadteSchema(getSchema(loginSchema)),
+    validateSchema(getSchema(loginSchema)),
     matchedBody(),
     wrapAsync(async (req, res) => {
         const credentials = req.matchedBody;

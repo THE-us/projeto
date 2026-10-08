@@ -1,5 +1,5 @@
-const environment = require('./util/environment');
-environment.init();
+// const environment = require('./util/environment');
+// environment.init();
 
 require('dotenv').config();
 // const cors             =                 require('cors');

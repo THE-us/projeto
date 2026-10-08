@@ -6,6 +6,6 @@ const auth = require('../services/auth.service');
 router.use('auth', require('./auth.controller'));
 router.use('/info', require('./info.controller'));
 
-router.use('/usuarios', auth.jwtAuthorize(), require('./usuario.controller'));
+router.use('/usuario', auth.jwtAuthorize(), require('./usuario.controller'));
 
 module.exports = router;
