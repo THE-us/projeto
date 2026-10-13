@@ -1,6 +1,6 @@
+//Apenas abre a porta
 const http =  require('http');
 const app  = require('./app');
-//const config = require('./config/config');
 const port = 3000;
 
 const server = http.createServer(app);

@@ -27,6 +27,16 @@ const schemaSenha = {
     },
 };
 
+const schemaLogin = {
+    login: {
+        in: ['body'],
+        isLength:{
+            options: {min: 3, max: 30},
+        },
+    },
+    senha: schemaSenha,
+}
+
 const schema = {
     login: {
         in: ['body'],
@@ -70,6 +80,23 @@ router.post(
     matchedBody(),
     wrapAsync(async (req, res) => {
         await create(req, res, UsuarioService, body);
+    })
+);
+
+router.post(
+    '/login',
+    validateSchema(getSchema(schemaLogin)),
+    matchedBody(),
+    wrapAsync(async(req, res) => {
+        const { login, senha } = req.matchedBody;
+        const service = new UsuarioService();
+
+        const usuario = await service.authenticate(login, senha);
+        if (!usuario) {
+            return res.status(401).json({ error: 'Login ou senha inválidos' });
+        }
+
+        Response.ok(res, usuario);
     })
 );
 

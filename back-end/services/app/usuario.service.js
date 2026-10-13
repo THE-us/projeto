@@ -11,7 +11,6 @@ class UsuarioService extends BaseCrudService{
     static getModel(perfil){
         const UsuarioModel = db.getDatabase().Usuario;
         
-        // Verifica se o modelo existe e se o escopo excludeSenha foi registrado
         const hasExcludeSenha = UsuarioModel && UsuarioModel.options && UsuarioModel.options.scopes && UsuarioModel.options.scopes.excludeSenha;
 
         if(!perfil){
@@ -48,20 +47,33 @@ class UsuarioService extends BaseCrudService{
         }
     }
 
-    // --- Métodos de validação exigidos pelo BaseCrudService ---
+    async authenticate(login, senha) {
+        // Usamos unscope() ou findOne buscando o model sem o escopo de exclusão de senha
+        const UsuarioModel = UsuarioService.getModel(null); // ou buscar direto da base sem escopo
+        const usuario = await this.model.unscoped().findOne({ where: { login } });
+        
+        if (!usuario) {
+            return null;
+        }
+        
+        const senhaValida = await usuario.checkSenha(senha);
+            if (!senhaValida) {
+                return null;
+        }
+        
+        // Retorna o usuário autenticado
+        return usuario;
+    }
     
     async validateCreate(values) {
-        // Adicione regras de validação para criação aqui se precisar
         return true;
     }
 
     async validateUpdateById(id, values) {
-        // Adicione regras de validação para atualização aqui se precisar
         return true;
     }
 
     async validateDeleteById(id) {
-        // Adicione regras de validação para deleção aqui se precisar
         return true;
     }
 }
