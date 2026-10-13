@@ -13,7 +13,12 @@ const validate = (validations) => {
       return next();
     }
 
-    next(new ValidationError(errors.array()));
+    const errorMessages = errors
+      .array()
+      .map((err) => `${err.path}: ${err.msg}`)
+      .join('; ');
+
+    next(new ValidationError(errorMessages));
   };
 };
 

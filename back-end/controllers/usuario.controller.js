@@ -18,6 +18,7 @@ const{
 } = require('../bases/base-controller')();
 const auth = require('../services/auth.service');
 const UsuarioService = require('../services/app/usuario.service');
+const { body } = require('express-validator');
 
 const schemaSenha = {
     in: ['body'],
@@ -68,7 +69,7 @@ router.post(
     validateSchema(getSchema(schema)),
     matchedBody(),
     wrapAsync(async (req, res) => {
-        await create(req, res, UsuarioService, req.user.perfil);
+        await create(req, res, UsuarioService, body);
     })
 );
 

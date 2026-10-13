@@ -16,13 +16,19 @@ module.exports = () => {
     };
 
     const create = async(req, res, Service, params) => {
-        const { filter } = req;
-        const values = req.matchedBody || req.body;
-        const service = new Service(params);
-        values.createdBy = req.user?.id;
-        values.updatedBy = req.user?.id;
-        const instance = await service.create(values, filter);
-        Response.created(res, instance);
+        try {
+            const { filter } = req;
+            const values = req.matchedBody || req.body;
+            const service = new Service(params);
+            
+            // ❌ Removido o preenchimento de createdBy e updatedBy
+
+            const instance = await service.create(values, filter);
+            Response.created(res, instance);
+        } catch (error) {
+            console.error("🔥 ERRO DETALHADO NA CRIAÇÃO:", error);
+            throw error;
+        }
     };
 
     const deletedById = async(req, res, Service, params) => {

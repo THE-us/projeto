@@ -5,7 +5,8 @@ require('dotenv').config();
 // const cors             =                 require('cors');
 const express          =              require('express');
 const errorHandler = require('./errors/app-error-handler');
-// const database = require('./db/database');
+const database = require('./db/init-mysql-database');
+database.initDatabase();
 // const bodyParser       =          require('body-parser');
 
 // const usuarioRoute     =     require('./routes/usuario');
@@ -15,7 +16,7 @@ const errorHandler = require('./errors/app-error-handler');
 // const fluxoRoute = require('./routes/fluxo');
 
 const app = express();
-
+app.use(express.json());
 // app.use(cors({
 //     origin: 'http://localhost:4200'
 // }));

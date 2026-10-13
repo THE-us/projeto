@@ -9,10 +9,23 @@ class UsuarioService extends BaseCrudService{
     }
 
     static getModel(perfil){
+        const UsuarioModel = db.getDatabase().Usuario;
+        
+        // Verifica se o modelo existe e se o escopo excludeSenha foi registrado
+        const hasExcludeSenha = UsuarioModel && UsuarioModel.options && UsuarioModel.options.scopes && UsuarioModel.options.scopes.excludeSenha;
+
         if(!perfil){
-            return db.getDatabase().usuario.scope('excludeSenha');
+            return hasExcludeSenha ? UsuarioModel.scope('excludeSenha') : UsuarioModel;
         }else{
-            return db.getDatabase().usuario.scope('excludeSenha', {method: ['fromPerfil', perfil]});
+            const hasFromPerfil = UsuarioModel && UsuarioModel.options && UsuarioModel.options.scopes && UsuarioModel.options.scopes.fromPerfil;
+            
+            if (hasExcludeSenha && hasFromPerfil) {
+                return UsuarioModel.scope('excludeSenha', {method: ['fromPerfil', perfil]});
+            } else if (hasExcludeSenha) {
+                return UsuarioModel.scope('excludeSenha');
+            } else {
+                return UsuarioModel;
+            }
         }
     }
 
@@ -34,6 +47,23 @@ class UsuarioService extends BaseCrudService{
             }
         }
     }
+
+    // --- Métodos de validação exigidos pelo BaseCrudService ---
+    
+    async validateCreate(values) {
+        // Adicione regras de validação para criação aqui se precisar
+        return true;
+    }
+
+    async validateUpdateById(id, values) {
+        // Adicione regras de validação para atualização aqui se precisar
+        return true;
+    }
+
+    async validateDeleteById(id) {
+        // Adicione regras de validação para deleção aqui se precisar
+        return true;
+    }
 }
 
-module.exports = UsuarioService
+module.exports = UsuarioService;

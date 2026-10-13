@@ -1,7 +1,7 @@
 'use strict';
 const BaseModel = require('../bases/base-model');
 const bcrypt = require('bcryptjs');
-const config = require('../config/config.json');
+const config = require('../config/config');
 
 module.exports = (sequelize, DataTypes) => {
     class Usuario extends BaseModel{
@@ -34,12 +34,9 @@ module.exports = (sequelize, DataTypes) => {
                 {
                     sequelize,
                     modelName: 'Usuario',
+                    tableName: 'usuarios', // Garante que aponta para a tabela em minúsculo no MySQL
                     freezeTableName: true,
-                    timestamp: true,
-                    name:{
-                        singular: 'Usuario',
-                        plural: 'Usuarios',
-                    },
+                    timestamps: true,
                     scopes:{
                         excludeSenha:{
                             attributes:{
@@ -49,7 +46,7 @@ module.exports = (sequelize, DataTypes) => {
                     },
                     hooks:{
                         beforeSave: async(usuario) => {
-                            if(usuario.senha){
+                            if(usuario.senha && usuario.changed('senha')){
                                 const senhaHash = await bcrypt.hash(usuario.senha, config.security.bcryptSaltRound);
                                 usuario.senha = senhaHash;
                             }
@@ -59,17 +56,7 @@ module.exports = (sequelize, DataTypes) => {
             );
         }
 
-        static associate(models){
-            this.belongsTo(models.Usuario.scope('excludeSenha'), {
-                foreignKey: {name:'createdBy'},
-                as: 'CreatedBy',
-            });
-            this.belognsTo(models.Usuario.scope('excludeSenha'), {
-                foreignKey: {name: 'updatedBy'},
-                as: 'UpdatedBy',
-            });
-            super.associate(models);
-        }
+        // Sem associações de createdBy/updatedBy para manter apenas as colunas solicitadas
 
         async checkSenha(senha){
             const match = await bcrypt.compare(senha, this.senha);
@@ -88,4 +75,4 @@ module.exports = (sequelize, DataTypes) => {
 
     Usuario.init(sequelize);
     return Usuario;
-}
+};
