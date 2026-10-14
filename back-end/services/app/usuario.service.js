@@ -76,11 +76,11 @@ class UsuarioService extends BaseCrudService{
     }
     
     async validateCreate(login, nome, senha) {
-        const existe = await this.model.findOne({where:{login: login, nome: nome}});
+        // const existe = await this.model.findOne({where:{login: login, nome: nome}});
 
-        if(existe){
-            return res.status(401).json({error: 'Já existe um usuario com login e nome.'});
-        }
+        // if(existe){
+        //     return res.status(401).json({error: 'Já existe um usuario com login e nome.'});
+        // }
 
         return true;
     }

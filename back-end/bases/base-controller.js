@@ -27,6 +27,9 @@ module.exports = () => {
     const create = async(req, res, Service, params) => {
         try {
             const { filter } = req;
+
+            console.log('isso é o filter: ', filter);
+
             const values = req.matchedBody || req.body;
             const service = new Service(params);
 
