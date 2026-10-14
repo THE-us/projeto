@@ -29,6 +29,7 @@ module.exports = () => {
             const { filter } = req;
 
             console.log('isso é o filter: ', filter);
+            //console.log('*********************');
 
             const values = req.matchedBody || req.body;
             const service = new Service(params);
