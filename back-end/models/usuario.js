@@ -15,7 +15,6 @@ module.exports = (sequelize, DataTypes) => {
                     },
                     login:{
                         type: DataTypes.STRING,
-                        unique: true,
                         allowNull: false,
                     },
                     senha:{
@@ -34,7 +33,7 @@ module.exports = (sequelize, DataTypes) => {
                 {
                     sequelize,
                     modelName: 'Usuario',
-                    tableName: 'usuarios', // Garante que aponta para a tabela em minúsculo no MySQL
+                    tableName: 'usuarios',
                     freezeTableName: true,
                     timestamps: true,
                     scopes:{
@@ -56,8 +55,6 @@ module.exports = (sequelize, DataTypes) => {
             );
         }
 
-        // Sem associações de createdBy/updatedBy para manter apenas as colunas solicitadas
-
         async checkSenha(senha){
             const match = await bcrypt.compare(senha, this.senha);
             return match;
@@ -68,8 +65,8 @@ module.exports = (sequelize, DataTypes) => {
             return this.update({senha: novaSenhaHash});
         }
 
-        static async findByLogin(login){
-            return this.findOne({where: { login }});
+        static async findByNome(nome){
+            return this.findOne({where: { nome }});
         }
     }
 

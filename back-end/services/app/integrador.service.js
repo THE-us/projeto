@@ -4,7 +4,7 @@ const database = require('../../db/database');
 
 class IntegradorService extends BaseCrudService{
     constructor(){
-        super(database.getDatabase().Integrador.scope('excludeToken'));
+        super(database.getDatabase());
     }
 }
 

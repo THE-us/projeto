@@ -1,6 +1,7 @@
 'use strict';
 const BaseCrudService = require('../../bases/base-crud-service');
 const db = require('../../db/database');
+const ValidationError = require('../../errors/validation-error');
 
 class UsuarioService extends BaseCrudService{
     constructor(perfil){
@@ -47,25 +48,40 @@ class UsuarioService extends BaseCrudService{
         }
     }
 
-    async authenticate(login, senha) {
-        // Usamos unscope() ou findOne buscando o model sem o escopo de exclusão de senha
-        const UsuarioModel = UsuarioService.getModel(null); // ou buscar direto da base sem escopo
-        const usuario = await this.model.unscoped().findOne({ where: { login } });
+    async authenticate(login, nome, senha) {
+        const usuario = await this.model.unscoped().findOne({ where: { login, nome } });
+
+        //console.log('DEBUGGANDO');
+        //console.log('1. Usuario encontrado: ', usuario ? usuario.toJSON() : null);
         
         if (!usuario) {
+            //console.log('Usuario não existe');
             return null;
         }
+
+        //console.log('2. Senha recebida na requisição: ', senha);
+        //console.log('3. SenhaHash armazenada no objeto usuario: ', usuario.senha);
         
         const senhaValida = await usuario.checkSenha(senha);
-            if (!senhaValida) {
-                return null;
-        }
         
-        // Retorna o usuário autenticado
+        //console.log('4. Resultado de usuario.checkSenha(senha): ', senhaValida);
+
+        if (!senhaValida) {
+            //console.log('Senha inválida');
+            return null;
+        }
+    
+        //console.log('Retorno: ', usuario);
         return usuario;
     }
     
-    async validateCreate(values) {
+    async validateCreate(login, nome, senha) {
+        const existe = await this.model.findOne({where:{login: login, nome: nome}});
+
+        if(existe){
+            return res.status(401).json({error: 'Já existe um usuario com login e nome.'});
+        }
+
         return true;
     }
 

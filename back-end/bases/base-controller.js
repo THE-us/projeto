@@ -9,9 +9,18 @@ module.exports = () => {
     const router = express.Router();
 
     const findAll = async(req, res, Service, params) => {
+        console.log('este é req: ', req);
+
         const { filter } = req;
         const service = new Service(params);
+        
+        console.log('este é o service: ', service);
+        console.log('este é o filter: ', filter);
+        
         const instances = await service.findAll(filter);
+
+        console.log('essas são as instancias: ', instances);
+        
         ReportingObserver.ok(res, instances);
     };
 
@@ -20,13 +29,10 @@ module.exports = () => {
             const { filter } = req;
             const values = req.matchedBody || req.body;
             const service = new Service(params);
-            
-            // ❌ Removido o preenchimento de createdBy e updatedBy
 
             const instance = await service.create(values, filter);
             Response.created(res, instance);
         } catch (error) {
-            console.error("🔥 ERRO DETALHADO NA CRIAÇÃO:", error);
             throw error;
         }
     };
