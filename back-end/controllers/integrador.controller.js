@@ -12,7 +12,10 @@ router.get(
     sqFilter(),
     wrapAsync(async (req, res) => {
         console.log('ENTROU AQUI');
-        await findAll(req, res, IntegradorService);
+
+        const service = new IntegradorService();
+
+        await service.puxarTodos(req, res);
     })
 );
 
