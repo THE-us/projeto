@@ -1,15 +1,18 @@
-const models = require('../models');
+'use strict';
+const{
+    router,
+    wrapAsync,
+    sqFilter,
+    findAll
+} = require('../bases/base-controller')();
+const MunicipioService = require('../services/app/municipio.service');
 
-function index(req, res){
-    models.Municipio.findAll().then(result => {
-        res.status(200).json(result);
-    }).catch(error => {
-        res.status(500).json({
-            message: "ERROR EM PEGAR TODOS OS MUNICIPIOS"
-        });
+router.get(
+    '/',
+    sqFilter(),
+    wrapAsync(async (req, res) => {
+        await findAll(req, res, MunicipioService);
     })
-}
+);
 
-module.exports = {
-    index: index
-}
+module.exports = router;
