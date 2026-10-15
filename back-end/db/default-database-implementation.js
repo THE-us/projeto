@@ -110,8 +110,7 @@ class DefaultDatabaseImplementation{
 
     fs.readdirSync(basePath)
       .filter((file) => {
-        // return file.endsWith('.js');
-        return file === 'usuario.js';
+        return file.endsWith('.js') && file !== 'index.js';
       })
       .forEach((file) => {
         const model = require(path.join(rootpath, basePath, file))(sequelize, Sequelize.DataTypes);

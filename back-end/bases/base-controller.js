@@ -9,19 +9,19 @@ module.exports = () => {
     const router = express.Router();
 
     const findAll = async(req, res, Service, params) => {
-        console.log('este é req: ', req);
+        //console.log('este é req: ', req);
 
         const { filter } = req;
         const service = new Service(params);
         
         console.log('este é o service: ', service);
-        console.log('este é o filter: ', filter);
+        //console.log('este é o filter: ', filter);
         
         const instances = await service.findAll(filter);
 
-        console.log('essas são as instancias: ', instances);
+        //console.log('essas são as instancias: ', instances);
         
-        ReportingObserver.ok(res, instances);
+        Response.ok(res, instances); //linha 24
     };
 
     const create = async(req, res, Service, params) => {
