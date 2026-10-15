@@ -14,7 +14,7 @@ module.exports = () => {
         const { filter } = req;
         const service = new Service(params);
         
-        console.log('este é o service: ', service);
+        //console.log('este é o service: ', service);
         //console.log('este é o filter: ', filter);
         
         const instances = await service.findAll(filter);
@@ -28,7 +28,7 @@ module.exports = () => {
         try {
             const { filter } = req;
 
-            console.log('isso é o filter: ', filter);
+            //console.log('isso é o filter: ', filter);
             //console.log('*********************');
 
             const values = req.matchedBody || req.body;

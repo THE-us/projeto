@@ -1,211 +1,123 @@
-const models    =         require('../models');
-const Validator = require('fastest-validator');
+'use strict';
+const{
+    router,
+    wrapAsync,
+    sqFilter,
+    findAll,
+    create,
+    updateById,
+    deletedById,
+    getSchema
+} = require('../bases/base-controller')();
+const EquipamentoService = require('../services/app/equipamento.service');
+const { validateSchema, matchedBody, validateParamIdAsIntAndSanitize } = require('../util/validations');
+const { findById } = require('../bases/base-model');
+const { Response } = require('../bases/base-controller')();
 
-function cadastrar(req, res){
-    const equipamento = {
-        codigo:                           req.body.codigo,
-        faixa:                             req.body.faixa,
-        tipo:                               req.body.tipo,
-        ativo:                             req.body.ativo,
-        local:                             req.body.local,
-        marca:                             req.body.marca,
-        modelo:                           req.body.modelo,
-        velocidadeLimite:       req.body.velocidadeLimite,
-        dataAfericao:               req.body.dataAfericao,
-        lacre:                             req.body.lacre,
-        dataRegistroInmetro: req.body.dataRegistroInmetro,
-        numeroInmetro:             req.body.numeroInmetro,
-        integradorId:               req.body.integradorId,
-        municipioId:                 req.body.municipioId
-    }
+const schema = {
+    codigo:{
+        in: ['body'],
+        isLength:{
+            options: {min: 1, max: 11},
+        },
+    },
+    faixa:{
+        in: ['body'],
+    },
+    tipo:{
+        in: ['body'],
+    },
+    ativo:{
+        in: ['body'],
+    },
+    local:{
+        in: ['body'],
+    },
+    marca:{
+        in: ['body'],
+    },
+    modelo:{
+        in: ['body'],
+    },
+    velocidadeLimite:{
+        in: ['body'],
+    },
+    dataAfericao:{
+        in: ['body'],
+    },
+    lacre:{
+        in: ['body'],
+    },
+    dataRegistroInmetro:{
+        in: ['body'],
+    },
+    numeroInmetro:{
+        in: ['body'],
+    },
+    integradorId:{
+        in: ['body'],
+    },
+    municipioId:{
+        in: ['body'],
+    },
+};
 
-    const schema = {
-        codigo:        {type: "string", optional: "false", max: 11},
-        faixa:                  {type: "number", optional: "false"},
-        tipo:                   {type: "string", optional: "false"},
-        ativo:                  {type: "number", optional: "false"},
-        local:         {type: "string", optional: "false", max: 80},
-        marca:         {type: "string", optional: "false", max: 40},
-        modelo:        {type: "string", optional: "false", max: 40},
-        velocidadeLimite:       {type: "number", optional: "false"},
-        dataAfericao:           {type: "string", optional: "false"},
-        lacre:         {type: "string", optional: "false", max: 20},
-        dataRegistroInmetro:     {type: "string", optional: "true"},
-        numeroInmetro:    {type: "string", optional: true, max: 30},
-        integradorId:           {type: "number", optional: "false"},
-        municipioId:            {type: "number", optional: "false"}
-    }
+router.post(
+    '/cadastrar',
+    validateSchema(getSchema(schema)),
+    matchedBody(),
+    wrapAsync(async (req, res) => {
+        await create(req, res, EquipamentoService);
+    })
+);
 
-    const v = new Validator();
-    const validarCadsEquip = v.validate(equipamento, schema);
+router.post(
+    '/:id',
+    validateParamIdAsIntAndSanitize(),
+    validateSchema(getSchema(schema)),
+    matchedBody(),
+    wrapAsync(async (req, res) => {
+        const { id } = req.params;
+        const value = req.matchedBody || req.body;
+        const service = new EquipamentoService();
 
-    if(validarCadsEquip !== true){
-        return res.status(400).json({
-            message: "ERRO EM DADOS INFORMADOS",
-            errors: validarCadsEquip
-        })
-    }else{
-        models.Municipio.findByPk(req.body.municipioId).then(result => {
-            if(result !== null){
-                models.Equipamento.create(equipamento).then(result => {
-                    res.status(201).json({
-                        message: "EQUIPAMENTO CADASTRADO COM SUCESSO",
-                        post: result
-                    });
-                }).catch(error => {
-                    res.status(500).json({
-                        message: "ERROR EM CADASTRAR EQUIPAMENTO",
-                        error: error
-                    });
-                });
-            }else{
-                res.status(400).json({
-                    message: "MUNICIPIO NÃO VALIDO"
-                })
-            }
-        });
-    }
-}
+        const instance = await service.updateById(id, value);
+        Response.ok(res, instance);
+    })
+);
 
-function atualizar(req, res){
-    const id = req.params.id;
-    const atualizarEquipamento = {
-        codigo:                           req.body.codigo,
-        faixa:                             req.body.faixa,
-        tipo:                               req.body.tipo,
-        ativo:                             req.body.ativo,
-        local:                             req.body.local,
-        marca:                             req.body.marca,
-        modelo:                           req.body.modelo,
-        velocidadeLimite:       req.body.velocidadeLimite,
-        dataAfericao:               req.body.dataAfericao,
-        lacre:                             req.body.lacre,
-        dataRegistroInmetro: req.body.dataRegistroInmetro,
-        numeroInmetro:             req.body.numeroInmetro,
-        integradorId:               req.body.integradorId,
-        municipioId:                 req.body.municipioId
-    }
+router.delete(
+    '/:id',
+    validateParamIdAsIntAndSanitize(),
+    wrapAsync(async (req, res) => {
+        const { id } = req.params;
+        const service = new EquipamentoService();
 
-    const schema = {
-        codigo:        {type: "string", optional: "false", max: 11},
-        faixa:                  {type: "number", optional: "false"},
-        tipo:                   {type: "string", optional: "false"},
-        ativo:                  {type: "number", optional: "false"},
-        local:         {type: "string", optional: "false", max: 80},
-        marca:         {type: "string", optional: "false", max: 40},
-        modelo:        {type: "string", optional: "false", max: 40},
-        velocidadeLimite:       {type: "number", optional: "false"},
-        dataAfericao:           {type: "string", optional: "false"},
-        lacre:         {type: "string", optional: "false", max: 20},
-        dataRegistroInmetro:     {type: "string", optional: "true"},
-        numeroInmetro:    {type: "string", optional: true, max: 30},
-        integradorId:           {type: "number", optional: "false"},
-        municipioId:            {type: "number", optional: "false"}
-    }
+        const deleted = await service.deleteByIdOrThrowError(id); 
+        
+        Response.ok(res, { deleted });
+    })
+);
 
-    const v = new Validator();
-    const validarAtulEquip = v.validate(atualizarEquipamento, schema);
+router.get(
+    '/',
+    sqFilter(),
+    wrapAsync(async (req, res) => {
+        await findAll(req, res, EquipamentoService);
+    })
+);
 
-    if(validarAtulEquip !== true){
-        return res.status(400).json({
-            message: "DADOS INVALIDADOS",
-            errors: validarAtulEquip
-        })
-    }
+router.get(
+    '/:id',
+    validateParamIdAsIntAndSanitize(),
+    sqFilter(),
+    wrapAsync(async (req, res) => {
+        const { id } = req.params;
+        const service = new EquipamentoService();
 
-    models.Municipio.findByPk(req.body.municipioId).then(result => {
-        if(result !== null){
-            models.Equipamento.update(atualizarEquipamento, {where: {id: id}}).then(result => {
-                res.status(201).json({
-                    message: "EQUIPAMENTO ATUALIZADO COM SUCESSO",
-                    post: result
-                });
-            }).catch(error => {
-                res.status(500).json({
-                    message: "ERROR EM ATUALIZAR O EQUIPAMENTO",
-                    error: error
-                });
-            });
-        }else{
-            res.status(400).json({
-                message: "MUNICIPIO NÃO VALIDO"
-            })
-        }
-    });
-}
+        const instance = await service.findByIdOrThrowError(id);
+        Response.ok(res, instance);
+    })
+);
 
-function deletar(req, res){
-    const id = req.params.id;
-    //const userId = req.userData.userId;
-
-    models.Equipamento.destroy({where:{id: id}}).then(result => {
-        if(result){
-            res.status(200).json({
-                message: "EQUIPAMENTO DELETADO",
-                post: result
-            })
-        }else{
-            res.status(404).json({
-                message: "EQUIPAMENTO NÃO ENCONTRADO",
-            })
-        }
-    }).catch(error => {
-        res.status(500).json({
-            message: "ERRO EM DELETAR EQUIPAMENTO",
-            error: error
-        })
-    });
-}
-
-function index(req, res){
-    const where = {};
-
-    if(req.query.codigo) where.codigo = req.query.codigo;
-    if(req.query.faixa) where.faixa = req.query.faixa;
-    if(req.query.ativo !== undefined) where.ativo = req.query.ativo;
-    if(req.query.integradorId) where.integradorId = req.query.integradorId;
-
-    models.Equipamento.findAll({
-            where: where,
-            include: [
-                { model: models.Integrador, attributes: ['id', 'nome'] },
-                { model: models.Municipio, attributes: ['id', 'descricao', 'uf'] }
-            ]
-        }).then(result => {
-            res.status(200).json(result);
-        }).catch(error => {
-            res.status(500).json({ message: "ERRO EM PEGAR TODOS OS EQUIPAMENTOS" });
-        });
-}
-
-function buscarPorId(req, res){
-    const id = req.params.id;
-
-    models.Equipamento.findByPk(id, {
-        include: [
-            {model: models.Integrador, attributes: ['id', 'nome']},
-            {model: models.Municipio, attributes: ['id', 'descricao', 'uf']}
-        ]
-    }).then(result => {
-        if(!result){
-            return res.status(404).json({
-                message: "EQUIPAMENTO NAO ENCONTRADO"
-            });
-        }
-
-        return res.status(200).json(result);
-    }).catch(error => {
-        return res.status(500).json({
-            message: "ERRO AO BUSCAR EQUIPAMENTO",
-            error: error
-        });
-    });
-}
-
-module.exports = {
-    cadastrar:     cadastrar,
-    atualizar:     atualizar,
-    deletar:         deletar,
-    index:             index,
-    buscarPorId: buscarPorId
-}
+module.exports = router;
