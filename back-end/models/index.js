@@ -17,7 +17,7 @@ if (config.use_env_variable) {
   sequelize = new Sequelize(config.database, config.username, config.password, config);
 }
 
-console.log("Arquivos que o Node enxerga na pasta models:", fs.readdirSync(__dirname));
+//console.log("Arquivos que o Node enxerga na pasta models:", fs.readdirSync(__dirname));
 
 fs
   .readdirSync(__dirname)

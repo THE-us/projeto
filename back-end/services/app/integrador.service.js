@@ -8,10 +8,10 @@ class IntegradorService extends BaseCrudService {
         const db = database.getDatabase();
         
         // 2. DEBUG: Vamos imprimir no terminal tudo o que o banco de dados carregou
-        console.log("=== DEBUG DA API ===");
-        console.log("1. Modelos disponíveis no banco:", Object.keys(db));
-        console.log("2. O modelo Integrador existe aqui dentro?:", db.Integrador ? "SIM" : "NÃO");
-        console.log("====================");
+        //console.log("=== DEBUG DA API ===");
+        //console.log("1. Modelos disponíveis no banco:", Object.keys(db));
+        //console.log("2. O modelo Integrador existe aqui dentro?:", db.Integrador ? "SIM" : "NÃO");
+        //console.log("====================");
 
         // 3. Passamos apenas o modelo correto para o BaseCrudService, 
         // ou disparamos um erro claro se ele não existir
