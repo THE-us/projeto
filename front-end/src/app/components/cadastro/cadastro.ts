@@ -14,7 +14,7 @@ export class CadastroComponent {
   login = '';
   senha = '';
   nome = '';
-  ativo = 1;
+  ativo = true;
   erro = '';
   sucesso = '';
 
@@ -23,7 +23,7 @@ export class CadastroComponent {
   onSubmit() {
     this.authService.signUp({ login: this.login, senha: this.senha, nome: this.nome, ativo: this.ativo }).subscribe({
       next: () => {
-        this.authService.login({ login: this.login, senha: this.senha }).subscribe({
+        this.authService.login({ login: this.login, nome: this.nome, senha: this.senha }).subscribe({
           next: (res) => {
             this.authService.salvarToken(res.token);
             this.router.navigate(['/equipamentos']);
