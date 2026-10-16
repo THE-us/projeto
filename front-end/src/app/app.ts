@@ -1,23 +1,12 @@
-import { Component } from '@angular/core';
-import { Router, RouterLink, RouterOutlet } from '@angular/router';
-import { CommonModule } from '@angular/common';
-import { AuthService } from './services/auth';
+import { Component, signal } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
+  imports: [RouterOutlet],
   selector: 'app-root',
-  standalone: true,
-  imports: [RouterOutlet, RouterLink, CommonModule],
+  styleUrl: './app.scss',
   templateUrl: './app.html',
 })
 export class App {
-  constructor(private authService: AuthService, private router: Router) {}
-
-  estaLogado(): boolean {
-    return this.authService.estaLogado();
-  }
-
-  logout() {
-    this.authService.logout();
-    this.router.navigate(['/login']);
-  }
+  protected readonly title = signal('front-end');
 }
