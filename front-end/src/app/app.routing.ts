@@ -14,6 +14,10 @@ export const routes: Routes = [
   {
     path: 'municipio',
     loadChildren: () => import('./views/municipio/municipio-module').then(m => m.MunicipioModule)
+  },
+  {
+    path: 'equipamento',
+    loadChildren: () => import('./views/equipamento/equipamento-module').then(m => m.EquipamentoModule)
   }
 ];
 

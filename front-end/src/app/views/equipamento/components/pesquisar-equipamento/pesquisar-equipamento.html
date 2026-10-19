@@ -1,1 +1,74 @@
-<p>pesquisar-equipamento works!</p>
+<div class="container" style="padding: 20px; background-color: #e5e7e9; min-height: 100vh;">
+  <h2 style="color: #2c3e50; font-weight: 400; margin-bottom: 20px;">Pesquisar Equipamento</h2>
+
+  <!-- Painel de Filtros -->
+  <div class="filtros-card">
+    <form (ngSubmit)="pesquisar()">
+
+      <div class="form-group">
+        <label>Código</label>
+        <input type="text" name="codigo" [(ngModel)]="filtros.codigo" placeholder="Ex: RDR-001">
+      </div>
+
+      <div class="form-group">
+        <label>Faixa</label>
+        <input type="number" name="faixa" [(ngModel)]="filtros.faixa" placeholder="Ex: 1">
+      </div>
+
+      <div class="form-group">
+        <label>Status</label>
+        <select name="ativo" [(ngModel)]="filtros.ativo">
+          <option value="">Todos</option>
+          <option value="1">Ativo</option>
+          <option value="0">Inativo</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Cód. Integrador</label>
+        <input type="number" name="integradorId" [(ngModel)]="filtros.integradorId" placeholder="ID">
+      </div>
+
+      <div class="acoes-filtro">
+        <button type="submit" class="btn-azul">Pesquisar</button>
+        <button type="button" class="btn-cinza" (click)="limparFiltros()">Limpar</button>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- Tabela de Resultados -->
+  <table border="1" cellpadding="12" cellspacing="0" class="tabela-dados">
+    <thead>
+      <tr>
+        <th>Código</th>
+        <th>Marca / Modelo</th>
+        <th>Tipo</th>
+        <th>Faixa</th>
+        <th>Local</th>
+        <th>Status</th>
+        <th style="text-align: center;">Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let eq of equipamentos">
+        <td>{{ eq.codigo }}</td>
+        <td>{{ eq.marca }} / {{ eq.modelo }}</td>
+        <td>{{ eq.tipo }}</td>
+        <td>{{ eq.faixa }}</td>
+        <td>{{ eq.local }}</td>
+        <td [style.color]="eq.ativo ? '#27ae60' : '#e74c3c'">
+          <b>{{ eq.ativo ? 'Ativo' : 'Inativo' }}</b>
+        </td>
+        <td style="text-align: center;">
+          <button class="btn-editar">Editar</button>
+          <button class="btn-excluir">Excluir</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div *ngIf="equipamentos.length === 0" style="margin-top: 20px; color: #7f8c8d;">
+    Nenhum equipamento encontrado com os filtros informados.
+  </div>
+</div>
