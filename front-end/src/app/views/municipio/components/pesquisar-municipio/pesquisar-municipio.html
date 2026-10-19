@@ -1,0 +1,26 @@
+<div class="container">
+  <h2>Lista de Municípios</h2>
+
+  <table border="1" cellpadding="10" cellspacing="0" style="width: 100%; text-align: left;">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Código</th>
+        <th>Descrição</th>
+        <th>UF</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let m of municipios">
+        <td>{{ m.id }}</td>
+        <td>{{ m.codigo }}</td>
+        <td>{{ m.descricao }}</td>
+        <td>{{ m.uf }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div *ngIf="municipios.length === 0" style="margin-top: 15px; color: red;">
+    Nenhum município encontrado. (Verifique se o backend Node.js está rodando!)
+  </div>
+</div>
