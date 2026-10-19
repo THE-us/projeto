@@ -41,7 +41,7 @@ router.post(
     wrapAsync(async (req, res) => {
         const credentials = req.matchedBody;
         const response = await authService.login(credentials);
-        Response.ok(req, response);
+        Response.ok(res, response);
     })
 );
 
@@ -52,7 +52,7 @@ router.post(
     wrapAsync(async (req, res) => {
         const tokens = req.matchedBody;
         const response = await authService.refresh(tokens);
-        Response.ok(req, response);
+        Response.ok(res, response);
     })
 );
 
@@ -67,7 +67,7 @@ router.post(
     wrapAsync(async (req, res) => {
         const password = req.matchedBody;
         const response = await authService.changePassword(password, req.user);
-        Response.ok(req, response);
+        Response.ok(res, response);
     })
 );
 

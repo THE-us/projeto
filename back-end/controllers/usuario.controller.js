@@ -27,22 +27,6 @@ const schemaSenha = {
     },
 };
 
-const schemaLogin = {
-    login: {
-        in: ['body'],
-        isLength:{
-            options: {min: 3, max: 30}
-        },
-    },
-    nome: {
-        in: ['body'],
-        isLength:{
-            options: {min: 1, max: 100},
-        },
-    },
-    senha: schemaSenha,
-}
-
 const schema = {
     login: {
         in: ['body'],
@@ -86,43 +70,10 @@ router.post(
     matchedBody(),
     wrapAsync(async (req, res) => {
         console.log('REQUISICAO SIGN-UP');
-        console.log('req.mathedBody: ', req.matchedBody);
-
         const {login, nome, senha} =  req.matchedBody;
         const service = new UsuarioService();
-
-        console.log('INFORMACOES PASSADAS PARA SIGN-UP: ', login, nome, senha);
-
         await service.validateCreate(login, nome, senha);
-
-        console.log('Resposta de validateCreate: ', service.validateCreate());
-
         await create(req, res, UsuarioService, body);
-    })
-);
-
-router.post(
-    '/login',
-    validateSchema(getSchema(schemaLogin)),
-    matchedBody(),
-    wrapAsync(async(req, res) => {
-        console.log('REQUISIÇÃO');
-        console.log('req.matchedBody: ', req.matchedBody);
-
-        const { login, nome, senha } = req.matchedBody;
-        const service = new UsuarioService();
-
-        console.log('Tentando autenticar usuário: ', login);
-
-        const usuario = await service.authenticate(login, nome, senha);
-
-        console.log('Resultado retornado pelo service.authenticate: ', usuario);
-
-        if (!usuario) {
-            return res.status(401).json({ error: 'Login ou senha inválidos' });
-        }
-
-        Response.ok(res, usuario);
     })
 );
 

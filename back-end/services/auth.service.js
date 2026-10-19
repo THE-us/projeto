@@ -20,7 +20,8 @@ class AuthService {
           throw new UnauthorizedError();
         }
         const { Integrador } = db.getDatabase();
-        const integrador = await Integrador.findById(id);
+        // CORREÇÃO: findById substituído por findByPk
+        const integrador = await Integrador.findByPk(id);
         if (!integrador || !integrador.ativo) {
           throw new UnauthorizedError();
         }
@@ -40,7 +41,10 @@ class AuthService {
 
   async login(credentials) {
     const { Usuario } = db.getDatabase();
-    const usuario = await Usuario.findByLogin(credentials.login);
+    
+    // CORREÇÃO PRINCIPAL: Usar o findOne e unscoped() para garantir que traz a senha
+    const usuario = await Usuario.unscoped().findOne({ where: { login: credentials.login } });
+    
     if (!usuario || !usuario.ativo) {
       throw new UnauthorizedError();
     }
@@ -61,7 +65,8 @@ class AuthService {
         throw new UnauthorizedError();
       }
       const { Usuario } = db.getDatabase();
-      const usuario = await Usuario.findById(payloadRefreshToken.id);
+      // CORREÇÃO: findById substituído por findByPk
+      const usuario = await Usuario.findByPk(payloadRefreshToken.id);
       if (!usuario || !usuario.ativo) {
         throw new UnauthorizedError();
       }
@@ -75,7 +80,8 @@ class AuthService {
 
   async changePassword(passwords, user) {
     const { Usuario } = db.getDatabase();
-    const usuario = await Usuario.findById(user.id);
+    // CORREÇÃO: findById substituído por findByPk
+    const usuario = await Usuario.findByPk(user.id);
     const matched = await usuario.checkSenha(passwords.senhaAntiga);
     if (!matched) {
       return { success: false, error: 'Senha antiga inválida.' };
@@ -87,7 +93,8 @@ class AuthService {
 
   async getUserDetails(userId) {
     const { Usuario } = db.getDatabase();
-    const usuario = await Usuario.findById(userId);
+    // CORREÇÃO: findById substituído por findByPk
+    const usuario = await Usuario.findByPk(userId);
     const userDetails = {
       nome: usuario.nome,
       perfil: usuario.perfil,
@@ -97,28 +104,34 @@ class AuthService {
 
   jwtAuthorize() {
     return [
-      // authenticate JWT token and attach user to request object (req.user)
       jwt({
         secret: config.security.jwtSignKey,
         algorithms: ['HS256'],
       }),
 
-      // autoriza para o órgao do token
       async (req, res, next) => {
-        if (!req.auth) {
+        try {
+          if (!req.auth || !req.auth.id) {
+            return next(new UnauthorizedError());
+          }
+          const { Usuario } = db.getDatabase();
+          
+          // CORREÇÃO: findById substituído por findByPk com unscoped()
+          const usuario = await Usuario.unscoped().findByPk(req.auth.id);
+          
+          if (!usuario || (usuario.ativo !== undefined && !usuario.ativo)) {
+            return next(new UnauthorizedError());
+          }
+          
+          req.auth.perfil = usuario.perfil || null; 
+          req.auth.login = usuario.login;
+          req.auth.name = usuario.nome;
+          
+          req.user = req.auth;
+          next();
+        } catch (error) {
           next(new UnauthorizedError());
         }
-        const { Usuario } = db.getDatabase();
-        const usuario = await Usuario.scope('excludeSenha').findById(req.auth.id);
-        if (!usuario || !usuario.ativo) {
-          next(new UnauthorizedError());
-        }
-        req.auth.perfil = usuario.perfil;
-        req.auth.login = usuario.login;
-        req.auth.name = usuario.nome;
-        // For backward compatibility, also set req.user
-        req.user = req.auth;
-        next();
       },
     ];
   }

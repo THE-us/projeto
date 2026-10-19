@@ -3,13 +3,17 @@ import { RouterModule, Routes } from '@angular/router';
 
 export const routes: Routes = [
   {
-    path: 'municipio',
-    loadChildren: () => import('./views/municipio/municipio-module').then(m => m.MunicipioModule)
+    path: 'login',
+    loadChildren: () => import('./views/login/login-module').then(m => m.LoginModule)
   },
   {
     path: '',
-    redirectTo: 'municipio',
+    redirectTo: 'login',
     pathMatch: 'full'
+  },
+  {
+    path: 'municipio',
+    loadChildren: () => import('./views/municipio/municipio-module').then(m => m.MunicipioModule)
   }
 ];
 

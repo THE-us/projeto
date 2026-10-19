@@ -30,6 +30,7 @@ class UsuarioService extends BaseCrudService{
     }
 
     async alterarSenha(id, values){
+        // Assumindo que findByIdOrThrowError vem do seu BaseCrudService. Se der erro no futuro, trocamos para findByPk.
         const usuario = await this.findByIdOrThrowError(id);
         usuario.senha = values.senha;
         await usuario.save();
@@ -47,41 +48,8 @@ class UsuarioService extends BaseCrudService{
             }
         }
     }
-
-    async authenticate(login, nome, senha) {
-        const usuario = await this.model.unscoped().findOne({ where: { login, nome } });
-
-        //console.log('DEBUGGANDO');
-        //console.log('1. Usuario encontrado: ', usuario ? usuario.toJSON() : null);
-        
-        if (!usuario) {
-            //console.log('Usuario não existe');
-            return null;
-        }
-
-        //console.log('2. Senha recebida na requisição: ', senha);
-        //console.log('3. SenhaHash armazenada no objeto usuario: ', usuario.senha);
-        
-        const senhaValida = await usuario.checkSenha(senha);
-        
-        //console.log('4. Resultado de usuario.checkSenha(senha): ', senhaValida);
-
-        if (!senhaValida) {
-            //console.log('Senha inválida');
-            return null;
-        }
-    
-        //console.log('Retorno: ', usuario);
-        return usuario;
-    }
     
     async validateCreate(login, nome, senha) {
-        // const existe = await this.model.findOne({where:{login: login, nome: nome}});
-
-        // if(existe){
-        //     return res.status(401).json({error: 'Já existe um usuario com login e nome.'});
-        // }
-
         return true;
     }
 

@@ -1,0 +1,26 @@
+<div class="login-container">
+  <div class="login-card">
+    <h1 class="title">Entrar</h1>
+    <p class="subtitle">Faça login em sua conta</p>
+
+    <form (ngSubmit)="fazerLogin()">
+
+      <div class="input-group">
+        <span class="icon">👤</span> <!-- Ícone de utilizador -->
+        <input type="text" name="login" [(ngModel)]="credenciais.login" placeholder="Login" required>
+      </div>
+
+      <div class="input-group">
+        <span class="icon">🔒</span>
+        <input type="password" name="senha" [(ngModel)]="credenciais.senha" placeholder="Senha" required>
+      </div>
+
+      <div *ngIf="erroLogin" style="color: #e74c3c; font-size: 13px; margin-bottom: 15px; text-align: center;">
+        Login ou senha inválidos. Tente novamente.
+      </div>
+
+      <button type="submit" class="btn-login">Login</button>
+
+    </form>
+  </div>
+</div>
