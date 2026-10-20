@@ -1,0 +1,127 @@
+<div class="container" style="padding: 20px; background-color: #e5e7e9; min-height: 100vh;">
+  <h2 style="color: #2c3e50; font-weight: 400; margin-bottom: 20px;">Cadastrar Equipamento</h2>
+
+  <div class="form-card">
+    <form (ngSubmit)="salvar()" #formEquip="ngForm">
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Código *</label>
+          <input type="text" name="codigo" [(ngModel)]="equipamento.codigo" required maxlength="11">
+        </div>
+
+        <div class="form-group">
+          <label>Tipo *</label>
+          <select name="tipo" [(ngModel)]="equipamento.tipo" required>
+            <option value="">Selecione...</option>
+            <option value="CEV">CEV</option>
+            <option value="REV">REV</option>
+            <option value="CEM">CEM</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Status *</label>
+          <select name="ativo" [(ngModel)]="equipamento.ativo" required>
+            <option [ngValue]="1">Ativo</option>
+            <option [ngValue]="0">Inativo</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Faixa *</label>
+          <input type="number" name="faixa" [(ngModel)]="equipamento.faixa" required>
+        </div>
+
+        <div class="form-group">
+          <label>Marca *</label>
+          <input type="text" name="marca" [(ngModel)]="equipamento.marca" required maxlength="40">
+        </div>
+
+        <div class="form-group">
+          <label>Modelo *</label>
+          <input type="text" name="modelo" [(ngModel)]="equipamento.modelo" required maxlength="40">
+        </div>
+
+        <div class="form-group">
+          <label>Localização *</label>
+          <input type="text" name="local" [(ngModel)]="equipamento.local" required maxlength="80">
+        </div>
+
+        <div class="form-group">
+          <label>Vel. Limite (km/h) *</label>
+          <input type="number" name="velocidadeLimite" [(ngModel)]="equipamento.velocidadeLimite" required>
+        </div>
+
+        <div class="form-group">
+          <label>Lacre *</label>
+          <input type="text" name="lacre" [(ngModel)]="equipamento.lacre" required maxlength="20">
+        </div>
+
+        <div class="form-group">
+          <label>Nº Inmetro</label>
+          <input type="text" name="numeroInmetro" [(ngModel)]="equipamento.numeroInmetro" maxlength="30">
+        </div>
+
+        <div class="form-group">
+          <label>Data de Aferição</label>
+          <input type="date" name="dataAfericao" [(ngModel)]="equipamento.dataAfericao">
+        </div>
+
+        <div class="form-group">
+          <label>Data Reg. Inmetro</label>
+          <input type="date" name="dataRegistroInmetro" [(ngModel)]="equipamento.dataRegistroInmetro">
+        </div>
+
+        <!-- Chaves Estrangeiras Avançadas (Autocompletar) -->
+        <div class="form-group autocomplete-container">
+          <label>Município *</label>
+          <input type="text"
+                 [(ngModel)]="buscaMunicipio"
+                 name="buscaMunicipio"
+                 autocomplete="off"
+                 placeholder="Digite para buscar..."
+                 (input)="filtrarMunicipios()"
+                 (focus)="filtrarMunicipios()"
+                 (blur)="fecharDropdowns()"
+                 required>
+
+          <ul class="dropdown-list" *ngIf="mostrarDropdownMunicipio && municipiosFiltrados.length > 0">
+            <li *ngFor="let m of municipiosFiltrados" (mousedown)="selecionarMunicipio(m)">
+              {{ m.descricao }} (UF: {{ m.uf }})
+            </li>
+          </ul>
+          <!-- Campo oculto para o Angular garantir a obrigatoriedade do ID -->
+          <input type="hidden" name="municipioId" [(ngModel)]="equipamento.municipioId" required>
+        </div>
+
+        <div class="form-group autocomplete-container">
+          <label>Integrador *</label>
+          <input type="text"
+                 [(ngModel)]="buscaIntegrador"
+                 name="buscaIntegrador"
+                 autocomplete="off"
+                 placeholder="Digite para buscar..."
+                 (input)="filtrarIntegradores()"
+                 (focus)="filtrarIntegradores()"
+                 (blur)="fecharDropdowns()"
+                 required>
+
+          <ul class="dropdown-list" *ngIf="mostrarDropdownIntegrador && integradoresFiltrados.length > 0">
+            <li *ngFor="let i of integradoresFiltrados" (mousedown)="selecionarIntegrador(i)">
+              {{ i.nome }}
+            </li>
+          </ul>
+          <!-- Campo oculto para o Angular garantir a obrigatoriedade do ID -->
+          <input type="hidden" name="integradorId" [(ngModel)]="equipamento.integradorId" required>
+        </div>
+      </div>
+
+      <div class="acoes-form">
+        <button type="submit" class="btn-verde" [disabled]="!formEquip.form.valid">Guardar Equipamento</button>
+        <button type="button" class="btn-cinza" (click)="cancelar()">Cancelar</button>
+      </div>
+
+    </form>
+  </div>
+</div>

@@ -30,7 +30,7 @@ export class Login {
         localStorage.setItem('token', resposta.accessToken);
 
         console.log('Login efetuado com sucesso!');
-        this.router.navigate(['/municipio']);
+        this.router.navigate(['/equipamento']);
       },
       error: (erro) => {
         console.error('Falha na autenticação', erro);

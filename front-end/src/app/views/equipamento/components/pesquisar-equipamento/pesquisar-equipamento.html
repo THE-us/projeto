@@ -1,39 +1,50 @@
 <div class="container" style="padding: 20px; background-color: #e5e7e9; min-height: 100vh;">
-  <h2 style="color: #2c3e50; font-weight: 400; margin-bottom: 20px;">Pesquisar Equipamento</h2>
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <h2 style="color: #2c3e50; font-weight: 400; margin: 0;">Pesquisar Equipamento</h2>
+    <!-- Este botão redireciona para a rota /equipamento/novo -->
+    <button class="btn-azul" routerLink="/equipamento/novo">+ Novo Equipamento</button>
+  </div>
 
-  <!-- Painel de Filtros -->
+<!-- Painel de Filtros -->
   <div class="filtros-card">
+    <!-- O ngSubmit assume o controlo: captura o clique no botão e o Enter no teclado! -->
     <form (ngSubmit)="pesquisar()">
+      <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-end;">
 
-      <div class="form-group">
-        <label>Código</label>
-        <input type="text" name="codigo" [(ngModel)]="filtros.codigo" placeholder="Ex: RDR-001">
+        <div class="form-group">
+          <label>Código</label>
+          <!-- Removidos os (keyup.enter) e (change) -->
+          <input type="text" name="codigo" [(ngModel)]="filtros.codigo" placeholder="Ex: RDR-001">
+        </div>
+
+        <div class="form-group">
+          <label>Faixa</label>
+          <input type="number" name="faixa" [(ngModel)]="filtros.faixa" placeholder="Ex: 1">
+        </div>
+
+        <div class="form-group">
+          <label>Status</label>
+          <select name="ativo" [(ngModel)]="filtros.ativo">
+            <option value="">Todos</option>
+            <option value="1">Ativo</option>
+            <option value="0">Inativo</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Nome do Integrador</label>
+          <input type="text" name="integradorNome" [(ngModel)]="filtros.integradorNome" placeholder="Ex: Nome do integrador">
+        </div>
+
+        <div class="acoes-filtro">
+          <!-- O botão de pesquisar agora é type="submit" e não tem (click) -->
+          <button type="submit" class="btn-azul">Pesquisar</button>
+
+          <!-- O botão de limpar continua como type="button" para não submeter o form -->
+          <button type="button" class="btn-cinza" (click)="limparFiltros()">Limpar</button>
+        </div>
+
       </div>
-
-      <div class="form-group">
-        <label>Faixa</label>
-        <input type="number" name="faixa" [(ngModel)]="filtros.faixa" placeholder="Ex: 1">
-      </div>
-
-      <div class="form-group">
-        <label>Status</label>
-        <select name="ativo" [(ngModel)]="filtros.ativo">
-          <option value="">Todos</option>
-          <option value="1">Ativo</option>
-          <option value="0">Inativo</option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label>Cód. Integrador</label>
-        <input type="number" name="integradorId" [(ngModel)]="filtros.integradorId" placeholder="ID">
-      </div>
-
-      <div class="acoes-filtro">
-        <button type="submit" class="btn-azul">Pesquisar</button>
-        <button type="button" class="btn-cinza" (click)="limparFiltros()">Limpar</button>
-      </div>
-
     </form>
   </div>
 
@@ -61,8 +72,8 @@
           <b>{{ eq.ativo ? 'Ativo' : 'Inativo' }}</b>
         </td>
         <td style="text-align: center;">
-          <button class="btn-editar">Editar</button>
-          <button class="btn-excluir">Excluir</button>
+          <button type="button" class="btn-editar">Editar</button>
+          <button type="button" class="btn-excluir">Excluir</button>
         </td>
       </tr>
     </tbody>

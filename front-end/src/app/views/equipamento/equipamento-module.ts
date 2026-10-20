@@ -3,13 +3,10 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms'; // Necessário para os filtros (ngModel)
 import { EquipamentoRoutingModule } from './equipamento-routing-module';
 import { PesquisarEquipamento } from './components/pesquisar-equipamento/pesquisar-equipamento';
+import { CadastrarEquipamento } from './components/cadastrar-equipamento/cadastrar-equipamento';
 
 @NgModule({
-  declarations: [PesquisarEquipamento],
-  imports: [
-    CommonModule,
-    FormsModule,
-    EquipamentoRoutingModule
-  ]
+  declarations: [PesquisarEquipamento, CadastrarEquipamento],
+  imports: [CommonModule, FormsModule, EquipamentoRoutingModule],
 })
-export class EquipamentoModule { }
+export class EquipamentoModule {}

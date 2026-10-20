@@ -11,18 +11,17 @@ import { EquipamentoService } from '../../services/equipamento.service';
 export class PesquisarEquipamento implements OnInit {
   equipamentos: Equipamento[] = [];
 
-  // Objeto que liga diretamente aos campos da interface
   filtros = {
     codigo: '',
     faixa: '',
     ativo: '',
-    integradorId: ''
+    integradorNome: ''
   };
 
   constructor(private equipamentoService: EquipamentoService) {}
 
   ngOnInit(): void {
-    this.pesquisar(); // Carrega todos os equipamentos ao abrir a página
+    this.pesquisar();
   }
 
   pesquisar(): void {
@@ -38,7 +37,7 @@ export class PesquisarEquipamento implements OnInit {
   }
 
   limparFiltros(): void {
-    this.filtros = { codigo: '', faixa: '', ativo: '', integradorId: '' };
+    this.filtros = { codigo: '', faixa: '', ativo: '', integradorNome: '' };
     this.pesquisar();
   }
 }

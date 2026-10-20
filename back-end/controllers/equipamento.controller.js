@@ -13,6 +13,8 @@ const EquipamentoService = require('../services/app/equipamento.service');
 const { validateSchema, matchedBody, validateParamIdAsIntAndSanitize } = require('../util/validations');
 const { findById } = require('../bases/base-model');
 const { Response } = require('../bases/base-controller')();
+const { Op } = require('sequelize');
+const db = require('../db/database');
 
 const schema = {
     codigo:{
@@ -103,7 +105,46 @@ router.get(
     '/',
     sqFilter(),
     wrapAsync(async (req, res) => {
-        await findAll(req, res, EquipamentoService);
+        const { codigo, faixa, ativo, integradorNome } = req.query;
+        
+        let whereCond = {};
+
+        if (codigo) {
+            whereCond.codigo = { [Op.like]: `%${codigo}%` };
+        }
+        if (faixa) {
+            whereCond.faixa = faixa;
+        }
+        if (ativo !== undefined && ativo !== '') {
+            whereCond.ativo = ativo;
+        }
+
+        let includeCond = [];
+        const { Integrador } = db.getDatabase();
+
+        // Filtra pelo Nome do Integrador (fazendo JOIN com a tabela Integrador)
+        if (integradorNome) {
+            includeCond.push({
+                model: Integrador,
+                where: {
+                    nome: { [Op.like]: `%${integradorNome}%` }
+                },
+                required: true
+            });
+        } else if (Integrador) {
+            includeCond.push({
+                model: Integrador,
+                required: false
+            });
+        }
+
+        const service = new EquipamentoService();
+        const equipamentos = await service.model.findAll({
+            where: whereCond,
+            include: includeCond
+        });
+
+        Response.ok(res, equipamentos);
     })
 );
 
