@@ -34,4 +34,16 @@ export class EquipamentoService {
   cadastrar(equipamento: Equipamento): Observable<Equipamento> {
     return this.http.post<Equipamento>(`${this.baseUrl}/cadastrar`, equipamento);
   }
+
+  excluir(id: number): Observable<any>{
+    return this.http.delete(`${this.baseUrl}/${id}`);
+  }
+
+  buscarPorId(id: number): Observable<Equipamento>{
+    return this.http.get<Equipamento>(`${this.baseUrl}/${id}`);
+  }
+
+  atualizar(id: number, equipamento: any): Observable<Equipamento>{
+    return this.http.post<Equipamento>(`${this.baseUrl}/${id}`, equipamento);
+  }
 }

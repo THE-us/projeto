@@ -40,4 +40,21 @@ export class PesquisarEquipamento implements OnInit {
     this.filtros = { codigo: '', faixa: '', ativo: '', integradorNome: '' };
     this.pesquisar();
   }
+
+  excluir(id: number | undefined): void {
+    if (!id) return;
+
+    if (confirm('Tem a certeza de que deseja excluir este equipamento? Esta ação não pode ser desfeita.')) {
+      this.equipamentoService.excluir(id).subscribe({
+        next: () => {
+          alert('Equipamento excluído com sucesso!');
+          this.pesquisar();
+        },
+        error: (erro) => {
+          console.error('Erro ao excluir:', erro);
+          alert('Erro ao excluir o equipamento. Verifique se ele não tem dependências no banco de dados.');
+        }
+      });
+    }
+  }
 }

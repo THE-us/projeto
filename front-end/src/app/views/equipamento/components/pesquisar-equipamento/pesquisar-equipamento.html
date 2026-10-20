@@ -14,7 +14,7 @@
         <div class="form-group">
           <label>Código</label>
           <!-- Removidos os (keyup.enter) e (change) -->
-          <input type="text" name="codigo" [(ngModel)]="filtros.codigo" placeholder="Ex: RDR-001">
+          <input type="text" name="codigo" [(ngModel)]="filtros.codigo" placeholder="Ex: 0000000">
         </div>
 
         <div class="form-group">
@@ -72,8 +72,8 @@
           <b>{{ eq.ativo ? 'Ativo' : 'Inativo' }}</b>
         </td>
         <td style="text-align: center;">
-          <button type="button" class="btn-editar">Editar</button>
-          <button type="button" class="btn-excluir">Excluir</button>
+          <button type="button" class="btn-editar" [routerLink]="['/equipamento/editar', eq.id]">Editar</button>
+          <button type="button" class="btn-excluir" (click)="excluir(eq.id)">Excluir</button>
         </td>
       </tr>
     </tbody>
