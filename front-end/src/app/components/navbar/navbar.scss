@@ -1,0 +1,56 @@
+.navbar {
+  background-color: #2c3e50;
+  padding: 0 30px;
+  height: 60px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  margin-bottom: 20px;
+
+  .logo {
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    letter-spacing: 1px;
+  }
+
+  .links {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+
+    a {
+      color: #bdc3c7;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      padding: 20px 0;
+      transition: 0.2s;
+
+      &:hover { color: #ffffff; }
+
+      /* Destaca o link quando a rota está ativa */
+      &.ativo {
+        color: #5bc0de;
+        border-bottom: 3px solid #5bc0de;
+      }
+    }
+
+    .btn-sair {
+      background-color: transparent;
+      border: 1px solid #e74c3c;
+      color: #e74c3c;
+      padding: 6px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: 0.2s;
+
+      &:hover {
+        background-color: #e74c3c;
+        color: white;
+      }
+    }
+  }
+}
