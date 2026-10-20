@@ -18,6 +18,10 @@ export const routes: Routes = [
   {
     path: 'equipamento',
     loadChildren: () => import('./views/equipamento/equipamento-module').then(m => m.EquipamentoModule)
+  },
+  {
+    path: 'fluxo',
+    loadChildren: () => import('./views/fluxo/fluxo-module').then(m => m.FluxoModule)
   }
 ];
 

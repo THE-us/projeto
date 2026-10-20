@@ -1,0 +1,77 @@
+<div class="container">
+  <h2>Pesquisar Fluxos</h2>
+
+  <div class="filtros-card">
+    <form (ngSubmit)="pesquisar()">
+      <div class="grid-filtros">
+        <div class="form-group">
+          <label>Data Início</label>
+          <input type="date" name="dataInicio" [(ngModel)]="filtros.dataInicio">
+        </div>
+
+        <div class="form-group">
+          <label>Data Fim</label>
+          <input type="date" name="dataFim" [(ngModel)]="filtros.dataFim">
+        </div>
+
+        <div class="form-group">
+          <label>Hora Início</label>
+          <input type="time" name="horaInicio" [(ngModel)]="filtros.horaInicio" step="1">
+        </div>
+
+        <div class="form-group">
+          <label>Hora Fim</label>
+          <input type="time" name="horaFim" [(ngModel)]="filtros.horaFim" step="1">
+        </div>
+
+        <div class="form-group">
+          <label>Placa</label>
+          <input type="text" name="placa" [(ngModel)]="filtros.placa" placeholder="ABC1234" maxlength="7">
+        </div>
+
+        <div class="form-group">
+          <label>ID Equipamento</label>
+          <input type="number" name="equipamentoId" [(ngModel)]="filtros.equipamentoId" placeholder="Ex: 1">
+        </div>
+      </div>
+
+      <div class="acoes-filtro">
+        <button type="submit" class="btn-azul">Pesquisar</button>
+        <button type="button" class="btn-cinza" (click)="limparFiltros()">Limpar</button>
+      </div>
+    </form>
+  </div>
+
+  <table class="tabela-dados" *ngIf="fluxos.length > 0">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Data</th>
+        <th>Hora</th>
+        <th>Placa</th>
+        <th>Velocidade</th>
+        <th>Classe</th>
+        <th>ID Equip.</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let f of fluxos">
+        <td>{{ f.id }}</td>
+        <td>{{ f.data | date:'dd/MM/yyyy' }}</td>
+        <td>{{ f.hora }}</td>
+        <td><b>{{ f.placa }}</b></td>
+        <td>{{ f.velMed }} km/h</td>
+        <td>{{ f.classVeic }}</td>
+        <td>{{ f.equipamentoId }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div *ngIf="fluxos.length === 0" class="mensagem-vazia">
+    Utilize os filtros acima para pesquisar os fluxos registados.
+  </div>
+
+  <div *ngIf="fluxos.length === 30" class="mensagem-alerta">
+    <i>A pesquisa atingiu o limite de 30 resultados exibidos.</i>
+  </div>
+</div>

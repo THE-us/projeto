@@ -1,0 +1,50 @@
+<div class="container">
+  <h2>Análise de Fluxos por Equipamento</h2>
+
+  <div class="filtros-card">
+    <form (ngSubmit)="filtrar()">
+      <div class="grid-filtros">
+
+        <div class="form-group">
+          <label>Data Início</label>
+          <input type="date" name="dataInicio" [(ngModel)]="filtros.dataInicio">
+        </div>
+
+        <div class="form-group">
+          <label>Data Fim</label>
+          <input type="date" name="dataFim" [(ngModel)]="filtros.dataFim">
+        </div>
+
+      </div>
+
+      <div class="acoes-filtro">
+        <button type="submit" class="btn-azul">Filtrar Intervalo</button>
+        <button type="button" class="btn-cinza" (click)="limparFiltros()">Mostrar Total Geral</button>
+      </div>
+    </form>
+  </div>
+
+  <table class="tabela-dados" *ngIf="dadosAnalise.length > 0">
+    <thead>
+      <tr>
+        <th>ID Equipamento</th>
+        <th>Código do Equipamento</th>
+        <th>Faixa</th>
+        <th>Quantidade de Fluxos</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let item of dadosAnalise">
+        <td>{{ item.equipamentoId }}</td>
+        <!-- O seu backend inclui o modelo Equipamento, então podemos aceder diretamente aos dados dele -->
+        <td><b>{{ item.Equipamento?.codigo || 'N/D' }}</b></td>
+        <td>{{ item.Equipamento?.faixa || 'N/D' }}</td>
+        <td class="destaque-total">{{ item.totalFluxos }} passagens</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div *ngIf="dadosAnalise.length === 0" class="mensagem-vazia">
+    Nenhum fluxo encontrado para o intervalo de datas selecionado.
+  </div>
+</div>
