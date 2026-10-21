@@ -99,3 +99,37 @@
   color: #e67e22;
   font-size: 13px;
 }
+
+.paginacao-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+
+  .info-paginacao {
+    color: #666;
+    font-size: 0.9rem;
+  }
+
+  .controles-paginacao {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+
+    button {
+      padding: 8px 16px;
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    }
+
+    .pagina-atual {
+      font-weight: bold;
+      color: #333;
+    }
+  }
+}

@@ -42,7 +42,8 @@
     </form>
   </div>
 
-  <table class="tabela-dados" *ngIf="fluxos.length > 0">
+<table class="tabela-dados" *ngIf="fluxos.length > 0">
+    <!-- ... O SEU THEAD E TBODY CONTINUAM IGUAIS AQUI ... -->
     <thead>
       <tr>
         <th>ID</th>
@@ -67,11 +68,29 @@
     </tbody>
   </table>
 
+  <!-- SE NÃO TIVER DADOS -->
   <div *ngIf="fluxos.length === 0" class="mensagem-vazia">
     Utilize os filtros acima para pesquisar os fluxos registados.
   </div>
 
-  <div *ngIf="fluxos.length === 30" class="mensagem-alerta">
-    <i>A pesquisa atingiu o limite de 30 resultados exibidos.</i>
+  <!-- A MÁGICA DA PAGINAÇÃO ENTRA AQUI -->
+  <div class="paginacao-container" *ngIf="totalRegistros > 0">
+    <div class="info-paginacao">
+      Exibindo {{ fluxos.length }} de <b>{{ totalRegistros }}</b> fluxos encontrados.
+    </div>
+
+    <div class="controles-paginacao">
+      <button class="btn-cinza" [disabled]="paginaAtual === 1" (click)="mudarPagina(paginaAtual - 1)">
+        &laquo; Anterior
+      </button>
+
+      <span class="pagina-atual">
+        Página {{ paginaAtual }} de {{ totalPaginas }}
+      </span>
+
+      <button class="btn-cinza" [disabled]="paginaAtual === totalPaginas" (click)="mudarPagina(paginaAtual + 1)">
+        Próxima &raquo;
+      </button>
+    </div>
   </div>
 </div>

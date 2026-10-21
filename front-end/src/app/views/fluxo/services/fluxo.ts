@@ -11,14 +11,19 @@ export class FluxoService {
 
   constructor(private http: HttpClient) { }
 
-  pesquisar(filtros: any): Observable<any[]> {
-    let params = new HttpParams();
+  // Agora recebe página e limite, e retorna 'any' em vez de 'any[]', pois o backend envia um objeto com dados e totais
+  pesquisar(filtros: any, pagina: number = 1, limite: number = 30): Observable<any> {
+    let params = new HttpParams()
+      .set('pagina', pagina.toString())
+      .set('limite', limite.toString());
+
     Object.keys(filtros).forEach(key => {
       if (filtros[key] !== null && filtros[key] !== '') {
         params = params.set(key, filtros[key]);
       }
     });
-    return this.http.get<any[]>(`${this.baseUrl}/pesquisa`, { params });
+
+    return this.http.get<any>(`${this.baseUrl}/pesquisa`, { params });
   }
 
   analisar(filtros: any): Observable<any[]> {

@@ -14,15 +14,11 @@ class FluxoService extends BaseCrudService{
         const where = {};
 
         if (filtros.dataInicio && filtros.dataFim) {
-            where.data = {
-                [Op.between]: [filtros.dataInicio, filtros.dataFim]
-            };
+            where.data = { [Op.between]: [filtros.dataInicio, filtros.dataFim] };
         }
 
         if (filtros.horaInicio && filtros.horaFim) {
-            where.hora = {
-                [Op.between]: [filtros.horaInicio, filtros.horaFim]
-            };
+            where.hora = { [Op.between]: [filtros.horaInicio, filtros.horaFim] };
         }
 
         if (filtros.placa) where.placa = filtros.placa;
@@ -33,13 +29,26 @@ class FluxoService extends BaseCrudService{
             throw new Error('É necessário informar pelo menos um filtro para a pesquisa.');
         }
 
-        const resultados = await this.model.findAll({
+        // --- LÓGICA DE PAGINAÇÃO ---
+        const pagina = parseInt(filtros.pagina) || 1;
+        const limite = parseInt(filtros.limite) || 30;
+        const salto = (pagina - 1) * limite;
+
+        // findAndCountAll traz os dados E o total geral do banco
+        const resultados = await this.model.findAndCountAll({
             where: where,
-            limit: 30,
+            limit: limite,
+            offset: salto,
             order: [['data', 'DESC'], ['hora', 'DESC']]
         });
 
-        return resultados;
+        // Retorna um objeto estruturado para o Front-end
+        return {
+            dados: resultados.rows,          // As 30 linhas da tabela
+            totalRegistros: resultados.count, // Ex: 65.430
+            paginaAtual: pagina,
+            totalPaginas: Math.ceil(resultados.count / limite)
+        };
     }
 
     async analisar(filtros) {

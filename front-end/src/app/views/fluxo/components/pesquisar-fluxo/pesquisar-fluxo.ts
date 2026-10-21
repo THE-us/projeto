@@ -11,6 +11,12 @@ export class PesquisarFluxo implements OnInit {
   fluxos: any[] = [];
   carregando = false;
 
+  // Variáveis de Paginação
+  paginaAtual = 1;
+  limitePorPagina = 30;
+  totalRegistros = 0;
+  totalPaginas = 0;
+
   filtros: any = {
     dataInicio: '', dataFim: '', horaInicio: '', horaFim: '', placa: '', equipamentoId: ''
   };
@@ -21,9 +27,8 @@ export class PesquisarFluxo implements OnInit {
     const filtrosSalvos = sessionStorage.getItem('filtrosPesquisaFluxo');
     if (filtrosSalvos) {
       this.filtros = JSON.parse(filtrosSalvos);
-
       if (this.temFiltroPreenchido()) {
-        this.pesquisar();
+        this.pesquisar(1); // Restaura na página 1
       }
     }
   }
@@ -32,35 +37,50 @@ export class PesquisarFluxo implements OnInit {
     return Object.values(this.filtros).some(valor => valor !== null && valor !== '');
   }
 
-  pesquisar(): void {
+  // Agora recebe a página que o utilizador quer ver
+  pesquisar(paginaDesejada: number = 1): void {
     if (!this.temFiltroPreenchido()) {
-      alert('Atenção: É obrigatório informar pelo menos um filtro (ex: intervalo de datas, placa ou equipamento).');
+      alert('Atenção: É obrigatório informar pelo menos um filtro.');
       return;
     }
 
     if (this.carregando) return;
     this.carregando = true;
+    this.paginaAtual = paginaDesejada;
 
     sessionStorage.setItem('filtrosPesquisaFluxo', JSON.stringify(this.filtros));
 
-    this.fluxoService.pesquisar(this.filtros).subscribe({
-      next: (dados) => {
-        this.fluxos = [...dados];
+    // Envia a página atual e o limite para o serviço
+    this.fluxoService.pesquisar(this.filtros, this.paginaAtual, this.limitePorPagina).subscribe({
+      next: (resposta) => {
+        // Extrai os dados do novo formato JSON do Backend
+        this.fluxos = [...resposta.dados];
+        this.totalRegistros = resposta.totalRegistros;
+        this.totalPaginas = resposta.totalPaginas;
+
         this.carregando = false;
         this.cdr.detectChanges();
       },
       error: (erro) => {
         console.error('Erro ao pesquisar fluxos:', erro);
         this.carregando = false;
-        alert('Erro ao realizar a pesquisa. Verifique se os filtros são válidos.');
+        alert('Erro ao realizar a pesquisa.');
       }
     });
+  }
+
+  mudarPagina(novaPagina: number): void {
+    if (novaPagina >= 1 && novaPagina <= this.totalPaginas) {
+      this.pesquisar(novaPagina);
+    }
   }
 
   limparFiltros(): void {
     this.filtros = { dataInicio: '', dataFim: '', horaInicio: '', horaFim: '', placa: '', equipamentoId: '' };
     this.fluxos = [];
-
+    this.totalRegistros = 0;
+    this.totalPaginas = 0;
+    this.paginaAtual = 1;
     sessionStorage.removeItem('filtrosPesquisaFluxo');
     this.cdr.detectChanges();
   }
