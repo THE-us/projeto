@@ -73,7 +73,6 @@
           <input type="date" name="dataRegistroInmetro" [(ngModel)]="equipamento.dataRegistroInmetro">
         </div>
 
-        <!-- Chaves Estrangeiras Avançadas (Autocompletar) -->
         <div class="form-group autocomplete-container">
           <label>Município *</label>
           <input type="text"
@@ -91,7 +90,6 @@
               {{ m.descricao }} (UF: {{ m.uf }})
             </li>
           </ul>
-          <!-- Campo oculto para o Angular garantir a obrigatoriedade do ID -->
           <input type="hidden" name="municipioId" [(ngModel)]="equipamento.municipioId" required>
         </div>
 
@@ -112,7 +110,6 @@
               {{ i.nome }}
             </li>
           </ul>
-          <!-- Campo oculto para o Angular garantir a obrigatoriedade do ID -->
           <input type="hidden" name="integradorId" [(ngModel)]="equipamento.integradorId" required>
         </div>
       </div>

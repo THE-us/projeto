@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { LoginService } from '../../services/login.service';
 
@@ -8,7 +8,7 @@ import { LoginService } from '../../services/login.service';
   templateUrl: './login.html',
   styleUrl: './login.scss'
 })
-export class Login {
+export class Login implements OnInit {
 
   credenciais = {
     login: '',
@@ -21,6 +21,13 @@ export class Login {
     private loginService: LoginService,
     private router: Router
   ) {}
+
+  ngOnInit(): void {
+    // Passo C: Se o utilizador já tiver um token válido guardado, redireciona diretamente para o sistema
+    if (localStorage.getItem('token')) {
+      this.router.navigate(['/equipamento']);
+    }
+  }
 
   fazerLogin(): void {
     this.erroLogin = false;
