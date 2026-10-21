@@ -10,9 +10,8 @@ import { EquipamentoService } from '../../services/equipamento.service';
 })
 export class PesquisarEquipamento implements OnInit {
   equipamentos: Equipamento[] = [];
-  carregando = false; // Impede duplo clique e "spam" de requisições
+  carregando = false;
 
-  // O campo ativo inicializado como null (para ignorar no backend caso não mexa)
   filtros = {
     codigo: '',
     faixa: '',
@@ -26,13 +25,21 @@ export class PesquisarEquipamento implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Carrega tudo na primeira vez que abre
+    // 1. TENTA RECUPERAR A ÚLTIMA PESQUISA
+    const filtrosSalvos = sessionStorage.getItem('filtrosPesquisaEquipamento');
+    if (filtrosSalvos) {
+      this.filtros = JSON.parse(filtrosSalvos);
+    }
+
     this.pesquisar();
   }
 
   pesquisar(): void {
     if (this.carregando) return;
     this.carregando = true;
+
+    // 2. GUARDA A PESQUISA ATUAL NA MEMÓRIA
+    sessionStorage.setItem('filtrosPesquisaEquipamento', JSON.stringify(this.filtros));
 
     const filtrosLimpos: any = {};
 
@@ -48,8 +55,6 @@ export class PesquisarEquipamento implements OnInit {
       filtrosLimpos.integradorNome = this.filtros.integradorNome.trim();
     }
 
-    // CORREÇÃO: Converte para string e aceita ESTRITAMENTE '1' ou '0'.
-    // Qualquer outra coisa ('undefined', nulo, vazio) será ignorada pelo backend.
     const ativoVal = String(this.filtros.ativo);
     if (ativoVal === '1' || ativoVal === '0') {
       filtrosLimpos.ativo = Number(ativoVal);
@@ -59,7 +64,7 @@ export class PesquisarEquipamento implements OnInit {
       next: (dados) => {
         this.equipamentos = [...dados];
         this.carregando = false;
-        this.cdr.detectChanges(); // Força a atualização da tela
+        this.cdr.detectChanges();
       },
       error: (erro) => {
         console.error('Erro ao pesquisar equipamentos:', erro);
@@ -70,6 +75,8 @@ export class PesquisarEquipamento implements OnInit {
 
   limparFiltros(): void {
     this.filtros = { codigo: '', faixa: '', ativo: null, integradorNome: '' };
+    // 3. APAGA A PESQUISA DA MEMÓRIA
+    sessionStorage.removeItem('filtrosPesquisaEquipamento');
     this.pesquisar();
   }
 
@@ -79,7 +86,6 @@ export class PesquisarEquipamento implements OnInit {
     if (confirm('Tem a certeza de que deseja excluir este equipamento?')) {
       this.equipamentoService.excluir(id).subscribe({
         next: () => {
-          // Remove da tela instantaneamente sem precisar fazer nova requisição ao servidor
           this.equipamentos = this.equipamentos.filter(e => e.id !== id);
           this.cdr.detectChanges();
           alert('Equipamento excluído com sucesso!');

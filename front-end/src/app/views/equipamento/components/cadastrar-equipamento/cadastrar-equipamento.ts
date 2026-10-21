@@ -1,6 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
-import { Equipamento } from '../../models/equipamento';
 import { EquipamentoService } from '../../services/equipamento.service';
 import { MunicipioService } from '../../../municipio/services/municipio.service';
 import { IntegradorService } from '../../services/integrador.service';
@@ -11,24 +10,24 @@ import { IntegradorService } from '../../services/integrador.service';
   templateUrl: './cadastrar-equipamento.html',
   styleUrl: './cadastrar-equipamento.scss'
 })
-export class CadastrarEquipamento implements OnInit {
+export class CadastrarEquipamento implements OnInit, OnDestroy {
   equipamento: any = {
     codigo: '', faixa: null, tipo: '', ativo: 1, local: '', marca: '', modelo: '',
     velocidadeLimite: null, lacre: '', dataAfericao: '', dataRegistroInmetro: '',
     numeroInmetro: '', municipioId: null, integradorId: null
   };
 
-  // Controlo do Autocompletar Municípios
   municipios: any[] = [];
   municipiosFiltrados: any[] = [];
   buscaMunicipio = '';
   mostrarDropdownMunicipio = false;
 
-  // Controlo do Autocompletar Integradores
   integradores: any[] = [];
   integradoresFiltrados: any[] = [];
   buscaIntegrador = '';
   mostrarDropdownIntegrador = false;
+
+  private formSalvo = false; // Flag para saber se devemos apagar o rascunho no final
 
   constructor(
     private equipamentoService: EquipamentoService,
@@ -38,12 +37,42 @@ export class CadastrarEquipamento implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Carrega todos os dados ao abrir a tela
     this.municipioService.pesquisar().subscribe(dados => this.municipios = dados);
     this.integradorService.listar().subscribe(dados => this.integradores = dados);
+
+    // 1. RESTAURA O RASCUNHO SE EXISTIR
+    const rascunho = sessionStorage.getItem('rascunhoCadastroEquipamento');
+    if (rascunho) {
+      const dadosSalvos = JSON.parse(rascunho);
+      this.equipamento = dadosSalvos.equipamento;
+      this.buscaMunicipio = dadosSalvos.buscaMunicipio;
+      this.buscaIntegrador = dadosSalvos.buscaIntegrador;
+    }
   }
 
-  // --- LÓGICA DE FILTRAGEM MUNICÍPIO ---
+  // 2. ESCUTA O F5 OU FECHAMENTO DA ABA
+  @HostListener('window:beforeunload')
+  guardarRascunhoNavegador(): void {
+    this.salvarRascunho();
+  }
+
+  // 3. ESCUTA A MUDANÇA DE TELA PELA NAVBAR (Angular Router)
+  ngOnDestroy(): void {
+    this.salvarRascunho();
+  }
+
+  private salvarRascunho(): void {
+    // Só guarda se o formulário não tiver sido salvo/cancelado com sucesso
+    if (!this.formSalvo) {
+      const rascunho = {
+        equipamento: this.equipamento,
+        buscaMunicipio: this.buscaMunicipio,
+        buscaIntegrador: this.buscaIntegrador
+      };
+      sessionStorage.setItem('rascunhoCadastroEquipamento', JSON.stringify(rascunho));
+    }
+  }
+
   filtrarMunicipios(): void {
     this.mostrarDropdownMunicipio = true;
     this.municipiosFiltrados = this.municipios.filter(m =>
@@ -57,7 +86,6 @@ export class CadastrarEquipamento implements OnInit {
     this.mostrarDropdownMunicipio = false;
   }
 
-  // --- LÓGICA DE FILTRAGEM INTEGRADOR ---
   filtrarIntegradores(): void {
     this.mostrarDropdownIntegrador = true;
     this.integradoresFiltrados = this.integradores.filter(i =>
@@ -71,15 +99,13 @@ export class CadastrarEquipamento implements OnInit {
     this.mostrarDropdownIntegrador = false;
   }
 
-  // Ocultar dropdowns ao clicar fora (Opcional)
   fecharDropdowns(): void {
     setTimeout(() => {
       this.mostrarDropdownMunicipio = false;
       this.mostrarDropdownIntegrador = false;
-    }, 200); // Timeout permite o registo do clique antes de fechar
+    }, 200);
   }
 
-  // --- SALVAR ---
   salvar(): void {
     const payload = { ...this.equipamento };
 
@@ -90,6 +116,8 @@ export class CadastrarEquipamento implements OnInit {
     this.equipamentoService.cadastrar(payload).subscribe({
       next: () => {
         alert('Equipamento cadastrado com sucesso!');
+        this.formSalvo = true; // Avisa que terminou
+        sessionStorage.removeItem('rascunhoCadastroEquipamento'); // Limpa a memória
         this.router.navigate(['/equipamento']);
       },
       error: (erro) => console.error('Erro ao cadastrar:', erro)
@@ -97,6 +125,8 @@ export class CadastrarEquipamento implements OnInit {
   }
 
   cancelar(): void {
+    this.formSalvo = true; // Se desistiu, descartamos o rascunho
+    sessionStorage.removeItem('rascunhoCadastroEquipamento');
     this.router.navigate(['/equipamento']);
   }
 }

@@ -1,6 +1,6 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, HostListener } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { forkJoin } from 'rxjs'; // Importação crucial para executar chamadas em paralelo
+import { forkJoin } from 'rxjs';
 import { EquipamentoService } from '../../services/equipamento.service';
 import { MunicipioService } from '../../../municipio/services/municipio.service';
 import { IntegradorService } from '../../services/integrador.service';
@@ -19,6 +19,10 @@ export class EditarEquipamento implements OnInit {
     numeroInmetro: '', municipioId: null, integradorId: null
   };
 
+  // Variável para guardar a "foto" original dos dados
+  equipamentoOriginal: any = null;
+  formSalvo = false; // Flag para não exibir o alerta caso clique em "Salvar" com sucesso
+
   municipios: any[] = [];
   municipiosFiltrados: any[] = [];
   buscaMunicipio = '';
@@ -35,14 +39,12 @@ export class EditarEquipamento implements OnInit {
     private equipamentoService: EquipamentoService,
     private municipioService: MunicipioService,
     private integradorService: IntegradorService,
-    private cdr: ChangeDetectorRef // Injetado para sincronizar a tela
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
     this.equipamentoId = Number(this.route.snapshot.paramMap.get('id'));
 
-    // O forkJoin executa todas as requisições API em simultâneo.
-    // O código só continua quando TUDO estiver pronto.
     forkJoin({
       municipios: this.municipioService.pesquisar(),
       integradores: this.integradorService.listar(),
@@ -54,12 +56,13 @@ export class EditarEquipamento implements OnInit {
 
         const dados = resultados.equipamento;
 
-        // Formatar datas
         if (dados.dataAfericao) dados.dataAfericao = String(dados.dataAfericao).split('T')[0];
         if (dados.dataRegistroInmetro) dados.dataRegistroInmetro = String(dados.dataRegistroInmetro).split('T')[0];
 
-        // Atualiza o objeto clonando-o para forçar a renderização
         this.equipamento = { ...dados };
+
+        // TIRA A FOTO ORIGINAL DOS DADOS PARA COMPARAÇÃO FUTURA
+        this.equipamentoOriginal = JSON.parse(JSON.stringify(this.equipamento));
 
         const mun = this.municipios.find(m => m.id === dados.municipioId);
         if (mun) this.buscaMunicipio = mun.descricao;
@@ -67,15 +70,29 @@ export class EditarEquipamento implements OnInit {
         const int = this.integradores.find(i => i.id === dados.integradorId);
         if (int) this.buscaIntegrador = int.nome;
 
-        // Avisa a tela que os dados já chegaram e ela deve desenhar as caixas de texto preenchidas
         this.cdr.detectChanges();
       },
       error: (erro) => {
         console.error('Erro ao carregar dados', erro);
         alert('Erro ao carregar os dados.');
-        this.voltar();
+        this.router.navigate(['/equipamento']);
       }
     });
+  }
+
+  // Função que verifica se os dados atuais estão diferentes da foto original
+  temAlteracoesPendentes(): boolean {
+    if (this.formSalvo || !this.equipamentoOriginal) return false;
+    return JSON.stringify(this.equipamento) !== JSON.stringify(this.equipamentoOriginal);
+  }
+
+  // ESCUTA O F5 OU TENTATIVA DE FECHAR A ABA DO NAVEGADOR
+  @HostListener('window:beforeunload', ['$event'])
+  aoTentarSair($event: any): void {
+    if (this.temAlteracoesPendentes()) {
+      // Define a mensagem para o navegador disparar a caixa de alerta nativa
+      $event.returnValue = 'Existem alterações não salvas. Deseja mesmo sair?';
+    }
   }
 
   filtrarMunicipios(): void {
@@ -120,13 +137,20 @@ export class EditarEquipamento implements OnInit {
     this.equipamentoService.atualizar(this.equipamentoId, payload).subscribe({
       next: () => {
         alert('Equipamento atualizado com sucesso!');
-        this.voltar();
+        this.formSalvo = true; // Avisa que salvou com sucesso para não exibir o alerta
+        this.router.navigate(['/equipamento']);
       },
       error: (erro) => console.error('Erro ao atualizar:', erro)
     });
   }
 
   voltar(): void {
+    // ESCUTA O BOTÃO VOLTAR / CANCELAR DA SUA TELA
+    if (this.temAlteracoesPendentes()) {
+      const confirmar = confirm('Você tem alterações não salvas. Deseja descartá-las e sair?');
+      if (!confirmar) return; // Se ele cancelar, interrompe a navegação
+    }
+
     this.router.navigate(['/equipamento']);
   }
 }
