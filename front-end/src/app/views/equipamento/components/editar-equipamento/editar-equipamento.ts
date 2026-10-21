@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { forkJoin } from 'rxjs'; // Importação crucial para executar chamadas em paralelo
 import { EquipamentoService } from '../../services/equipamento.service';
 import { MunicipioService } from '../../../municipio/services/municipio.service';
 import { IntegradorService } from '../../services/integrador.service';
@@ -18,7 +19,6 @@ export class EditarEquipamento implements OnInit {
     numeroInmetro: '', municipioId: null, integradorId: null
   };
 
-  // Controlo do Autocompletar
   municipios: any[] = [];
   municipiosFiltrados: any[] = [];
   buscaMunicipio = '';
@@ -34,50 +34,50 @@ export class EditarEquipamento implements OnInit {
     private router: Router,
     private equipamentoService: EquipamentoService,
     private municipioService: MunicipioService,
-    private integradorService: IntegradorService
+    private integradorService: IntegradorService,
+    private cdr: ChangeDetectorRef // Injetado para sincronizar a tela
   ) {}
 
   ngOnInit(): void {
-    // 1. Pega o ID do equipamento que está no URL
     this.equipamentoId = Number(this.route.snapshot.paramMap.get('id'));
 
-    // 2. Carrega as listas primeiro para podermos mapear os nomes nos autocompletes
-    this.municipioService.pesquisar().subscribe(muns => {
-      this.municipios = muns;
-      this.integradorService.listar().subscribe(ints => {
-        this.integradores = ints;
+    // O forkJoin executa todas as requisições API em simultâneo.
+    // O código só continua quando TUDO estiver pronto.
+    forkJoin({
+      municipios: this.municipioService.pesquisar(),
+      integradores: this.integradorService.listar(),
+      equipamento: this.equipamentoService.buscarPorId(this.equipamentoId)
+    }).subscribe({
+      next: (resultados) => {
+        this.municipios = resultados.municipios;
+        this.integradores = resultados.integradores;
 
-        // 3. Só depois de ter as listas é que busca os dados do equipamento
-        this.carregarEquipamento();
-      });
-    });
-  }
+        const dados = resultados.equipamento;
 
-  carregarEquipamento(): void {
-    this.equipamentoService.buscarPorId(this.equipamentoId).subscribe({
-      next: (dados) => {
-        // Formatar datas para o input nativo HTML (YYYY-MM-DD)
+        // Formatar datas
         if (dados.dataAfericao) dados.dataAfericao = String(dados.dataAfericao).split('T')[0];
         if (dados.dataRegistroInmetro) dados.dataRegistroInmetro = String(dados.dataRegistroInmetro).split('T')[0];
 
-        this.equipamento = dados;
+        // Atualiza o objeto clonando-o para forçar a renderização
+        this.equipamento = { ...dados };
 
-        // Preencher os nomes visíveis nos campos de autocompletar
         const mun = this.municipios.find(m => m.id === dados.municipioId);
         if (mun) this.buscaMunicipio = mun.descricao;
 
         const int = this.integradores.find(i => i.id === dados.integradorId);
         if (int) this.buscaIntegrador = int.nome;
+
+        // Avisa a tela que os dados já chegaram e ela deve desenhar as caixas de texto preenchidas
+        this.cdr.detectChanges();
       },
       error: (erro) => {
-        console.error('Erro ao buscar equipamento', erro);
-        alert('Erro ao carregar os dados. Verifique se o equipamento existe.');
+        console.error('Erro ao carregar dados', erro);
+        alert('Erro ao carregar os dados.');
         this.voltar();
       }
     });
   }
 
-  // --- LÓGICA DE FILTRAGEM DO AUTOCOMPLETAR ---
   filtrarMunicipios(): void {
     this.mostrarDropdownMunicipio = true;
     this.municipiosFiltrados = this.municipios.filter(m =>
@@ -111,10 +111,8 @@ export class EditarEquipamento implements OnInit {
     }, 200);
   }
 
-  // --- ATUALIZAR ---
   salvar(): void {
     const payload = { ...this.equipamento };
-
     if (!payload.dataAfericao) payload.dataAfericao = null;
     if (!payload.dataRegistroInmetro) payload.dataRegistroInmetro = null;
     if (!payload.numeroInmetro) payload.numeroInmetro = null;

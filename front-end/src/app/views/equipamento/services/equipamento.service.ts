@@ -15,17 +15,15 @@ export class EquipamentoService {
   pesquisar(filtros: any): Observable<Equipamento[]> {
     let params = new HttpParams();
 
-    if (filtros.codigo) {
-      params = params.set('codigo', filtros.codigo);
-    }
-    if (filtros.faixa) {
-      params = params.set('faixa', filtros.faixa);
-    }
-    if (filtros.ativo !== null && filtros.ativo !== '') {
-      params = params.set('ativo', filtros.ativo);
-    }
-    if (filtros.integradorNome) {
-      params = params.set('integradorNome', filtros.integradorNome);
+    if (filtros) {
+      Object.keys(filtros).forEach(key => {
+        const valor = filtros[key];
+
+        // Bloqueia null, undefined, string vazia e a maldita string literal 'undefined'
+        if (valor !== null && valor !== undefined && valor !== '' && String(valor) !== 'undefined') {
+          params = params.set(key, valor);
+        }
+      });
     }
 
     return this.http.get<Equipamento[]>(this.baseUrl, { params });

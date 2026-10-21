@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef } from '@angular/core';
 import { FluxoService } from '../../services/fluxo';
 
 @Component({
@@ -9,17 +9,14 @@ import { FluxoService } from '../../services/fluxo';
 })
 export class PesquisarFluxo {
   fluxos: any[] = [];
+  carregando = false;
 
   filtros: any = {
-    dataInicio: '',
-    dataFim: '',
-    horaInicio: '',
-    horaFim: '',
-    placa: '',
-    equipamentoId: ''
+    dataInicio: '', dataFim: '', horaInicio: '', horaFim: '', placa: '', equipamentoId: ''
   };
 
-  constructor(private fluxoService: FluxoService) {}
+  // Injetamos o ChangeDetectorRef aqui
+  constructor(private fluxoService: FluxoService, private cdr: ChangeDetectorRef) {}
 
   temFiltroPreenchido(): boolean {
     return Object.values(this.filtros).some(valor => valor !== null && valor !== '');
@@ -31,12 +28,18 @@ export class PesquisarFluxo {
       return;
     }
 
+    if (this.carregando) return;
+    this.carregando = true;
+
     this.fluxoService.pesquisar(this.filtros).subscribe({
       next: (dados) => {
-        this.fluxos = dados;
+        this.fluxos = [...dados]; // Recria a lista para o HTML notar a diferença
+        this.carregando = false;
+        this.cdr.detectChanges(); // Acorda o Angular imediatamente no primeiro clique
       },
       error: (erro) => {
         console.error('Erro ao pesquisar fluxos:', erro);
+        this.carregando = false;
         alert('Erro ao realizar a pesquisa. Verifique se os filtros são válidos.');
       }
     });
@@ -45,5 +48,6 @@ export class PesquisarFluxo {
   limparFiltros(): void {
     this.filtros = { dataInicio: '', dataFim: '', horaInicio: '', horaFim: '', placa: '', equipamentoId: '' };
     this.fluxos = [];
+    this.cdr.detectChanges();
   }
 }
