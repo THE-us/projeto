@@ -19,7 +19,6 @@ export class EquipamentoService {
       Object.keys(filtros).forEach(key => {
         const valor = filtros[key];
 
-        // Bloqueia null, undefined, string vazia e a maldita string literal 'undefined'
         if (valor !== null && valor !== undefined && valor !== '' && String(valor) !== 'undefined') {
           params = params.set(key, valor);
         }

@@ -36,7 +36,6 @@
     <tbody>
       <tr *ngFor="let item of dadosAnalise">
         <td>{{ item.equipamentoId }}</td>
-        <!-- O seu backend inclui o modelo Equipamento, então podemos aceder diretamente aos dados dele -->
         <td><b>{{ item.Equipamento?.codigo || 'N/D' }}</b></td>
         <td>{{ item.Equipamento?.faixa || 'N/D' }}</td>
         <td class="destaque-total">{{ item.totalFluxos }} passagens</td>

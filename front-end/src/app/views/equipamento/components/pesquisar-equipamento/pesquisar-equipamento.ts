@@ -25,7 +25,6 @@ export class PesquisarEquipamento implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // 1. TENTA RECUPERAR A ÚLTIMA PESQUISA
     const filtrosSalvos = sessionStorage.getItem('filtrosPesquisaEquipamento');
     if (filtrosSalvos) {
       this.filtros = JSON.parse(filtrosSalvos);
@@ -38,7 +37,6 @@ export class PesquisarEquipamento implements OnInit {
     if (this.carregando) return;
     this.carregando = true;
 
-    // 2. GUARDA A PESQUISA ATUAL NA MEMÓRIA
     sessionStorage.setItem('filtrosPesquisaEquipamento', JSON.stringify(this.filtros));
 
     const filtrosLimpos: any = {};
@@ -75,7 +73,6 @@ export class PesquisarEquipamento implements OnInit {
 
   limparFiltros(): void {
     this.filtros = { codigo: '', faixa: '', ativo: null, integradorNome: '' };
-    // 3. APAGA A PESQUISA DA MEMÓRIA
     sessionStorage.removeItem('filtrosPesquisaEquipamento');
     this.pesquisar();
   }

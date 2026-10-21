@@ -27,7 +27,7 @@ export class CadastrarEquipamento implements OnInit, OnDestroy {
   buscaIntegrador = '';
   mostrarDropdownIntegrador = false;
 
-  private formSalvo = false; // Flag para saber se devemos apagar o rascunho no final
+  private formSalvo = false;
 
   constructor(
     private equipamentoService: EquipamentoService,
@@ -40,7 +40,6 @@ export class CadastrarEquipamento implements OnInit, OnDestroy {
     this.municipioService.pesquisar().subscribe(dados => this.municipios = dados);
     this.integradorService.listar().subscribe(dados => this.integradores = dados);
 
-    // 1. RESTAURA O RASCUNHO SE EXISTIR
     const rascunho = sessionStorage.getItem('rascunhoCadastroEquipamento');
     if (rascunho) {
       const dadosSalvos = JSON.parse(rascunho);
@@ -50,19 +49,16 @@ export class CadastrarEquipamento implements OnInit, OnDestroy {
     }
   }
 
-  // 2. ESCUTA O F5 OU FECHAMENTO DA ABA
   @HostListener('window:beforeunload')
   guardarRascunhoNavegador(): void {
     this.salvarRascunho();
   }
 
-  // 3. ESCUTA A MUDANÇA DE TELA PELA NAVBAR (Angular Router)
   ngOnDestroy(): void {
     this.salvarRascunho();
   }
 
   private salvarRascunho(): void {
-    // Só guarda se o formulário não tiver sido salvo/cancelado com sucesso
     if (!this.formSalvo) {
       const rascunho = {
         equipamento: this.equipamento,
@@ -116,8 +112,8 @@ export class CadastrarEquipamento implements OnInit, OnDestroy {
     this.equipamentoService.cadastrar(payload).subscribe({
       next: () => {
         alert('Equipamento cadastrado com sucesso!');
-        this.formSalvo = true; // Avisa que terminou
-        sessionStorage.removeItem('rascunhoCadastroEquipamento'); // Limpa a memória
+        this.formSalvo = true;
+        sessionStorage.removeItem('rascunhoCadastroEquipamento');
         this.router.navigate(['/equipamento']);
       },
       error: (erro) => console.error('Erro ao cadastrar:', erro)
@@ -125,7 +121,7 @@ export class CadastrarEquipamento implements OnInit, OnDestroy {
   }
 
   cancelar(): void {
-    this.formSalvo = true; // Se desistiu, descartamos o rascunho
+    this.formSalvo = true;
     sessionStorage.removeItem('rascunhoCadastroEquipamento');
     this.router.navigate(['/equipamento']);
   }

@@ -18,12 +18,10 @@ export class PesquisarFluxo implements OnInit {
   constructor(private fluxoService: FluxoService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void {
-    // 1. TENTA RECUPERAR A ÚLTIMA PESQUISA DE FLUXOS
     const filtrosSalvos = sessionStorage.getItem('filtrosPesquisaFluxo');
     if (filtrosSalvos) {
       this.filtros = JSON.parse(filtrosSalvos);
 
-      // Se houver algum filtro restaurado, já faz a pesquisa automaticamente
       if (this.temFiltroPreenchido()) {
         this.pesquisar();
       }
@@ -43,14 +41,13 @@ export class PesquisarFluxo implements OnInit {
     if (this.carregando) return;
     this.carregando = true;
 
-    // 2. GUARDA OS FILTROS ATUAIS NA MEMÓRIA
     sessionStorage.setItem('filtrosPesquisaFluxo', JSON.stringify(this.filtros));
 
     this.fluxoService.pesquisar(this.filtros).subscribe({
       next: (dados) => {
-        this.fluxos = [...dados]; // Recria a lista para o HTML notar a diferença
+        this.fluxos = [...dados];
         this.carregando = false;
-        this.cdr.detectChanges(); // Acorda o Angular imediatamente no primeiro clique
+        this.cdr.detectChanges();
       },
       error: (erro) => {
         console.error('Erro ao pesquisar fluxos:', erro);
@@ -64,7 +61,6 @@ export class PesquisarFluxo implements OnInit {
     this.filtros = { dataInicio: '', dataFim: '', horaInicio: '', horaFim: '', placa: '', equipamentoId: '' };
     this.fluxos = [];
 
-    // 3. APAGA A PESQUISA DA MEMÓRIA
     sessionStorage.removeItem('filtrosPesquisaFluxo');
     this.cdr.detectChanges();
   }

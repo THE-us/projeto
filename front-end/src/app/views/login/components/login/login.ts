@@ -23,7 +23,6 @@ export class Login implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Passo C: Se o utilizador já tiver um token válido guardado, redireciona diretamente para o sistema
     if (localStorage.getItem('token')) {
       this.router.navigate(['/equipamento']);
     }
@@ -36,7 +35,6 @@ export class Login implements OnInit {
       next: (resposta) => {
         localStorage.setItem('token', resposta.accessToken);
 
-        // AVISA A NAVBAR EM TEMPO REAL:
         this.loginService.notificarLogin(true);
 
         console.log('Login efetuado com sucesso!');

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { LoginService } from '../../views/login/services/login.service'; // Ajuste o caminho se necessário
+import { LoginService } from '../../views/login/services/login.service';
 
 @Component({
   selector: 'app-navbar',
@@ -17,7 +17,6 @@ export class NavbarComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Fica a escutar as mensagens do login. Se for true, aparece. Se for false, some.
     this.loginService.authStatus$.subscribe(status => {
       this.exibirNavbar = status;
     });
@@ -25,7 +24,7 @@ export class NavbarComponent implements OnInit {
 
   sair(): void {
     localStorage.removeItem('token');
-    this.loginService.notificarLogin(false); // Avisa a Navbar para sumir instantaneamente
+    this.loginService.notificarLogin(false);
     this.router.navigate(['/login']);
   }
 }

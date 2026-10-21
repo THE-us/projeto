@@ -1,19 +1,15 @@
 <div class="container" style="padding: 20px; background-color: #e5e7e9; min-height: 100vh;">
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
     <h2 style="color: #2c3e50; font-weight: 400; margin: 0;">Pesquisar Equipamento</h2>
-    <!-- Este botão redireciona para a rota /equipamento/novo -->
     <button class="btn-azul" routerLink="/equipamento/novo">+ Novo Equipamento</button>
   </div>
 
-<!-- Painel de Filtros -->
   <div class="filtros-card">
-    <!-- O ngSubmit assume o controlo: captura o clique no botão e o Enter no teclado! -->
     <form (ngSubmit)="pesquisar()">
       <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-end;">
 
         <div class="form-group">
           <label>Código</label>
-          <!-- Removidos os (keyup.enter) e (change) -->
           <input type="text" name="codigo" [(ngModel)]="filtros.codigo" placeholder="Ex: 0000000">
         </div>
 
@@ -37,10 +33,8 @@
         </div>
 
         <div class="acoes-filtro">
-          <!-- O botão de pesquisar agora é type="submit" e não tem (click) -->
           <button type="submit" class="btn-azul">Pesquisar</button>
 
-          <!-- O botão de limpar continua como type="button" para não submeter o form -->
           <button type="button" class="btn-cinza" (click)="limparFiltros()">Limpar</button>
         </div>
 
@@ -48,7 +42,6 @@
     </form>
   </div>
 
-  <!-- Tabela de Resultados -->
   <table border="1" cellpadding="12" cellspacing="0" class="tabela-dados">
     <thead>
       <tr>

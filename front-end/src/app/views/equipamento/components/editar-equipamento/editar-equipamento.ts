@@ -19,9 +19,8 @@ export class EditarEquipamento implements OnInit {
     numeroInmetro: '', municipioId: null, integradorId: null
   };
 
-  // Variável para guardar a "foto" original dos dados
   equipamentoOriginal: any = null;
-  formSalvo = false; // Flag para não exibir o alerta caso clique em "Salvar" com sucesso
+  formSalvo = false;
 
   municipios: any[] = [];
   municipiosFiltrados: any[] = [];
@@ -61,7 +60,6 @@ export class EditarEquipamento implements OnInit {
 
         this.equipamento = { ...dados };
 
-        // TIRA A FOTO ORIGINAL DOS DADOS PARA COMPARAÇÃO FUTURA
         this.equipamentoOriginal = JSON.parse(JSON.stringify(this.equipamento));
 
         const mun = this.municipios.find(m => m.id === dados.municipioId);
@@ -80,17 +78,14 @@ export class EditarEquipamento implements OnInit {
     });
   }
 
-  // Função que verifica se os dados atuais estão diferentes da foto original
   temAlteracoesPendentes(): boolean {
     if (this.formSalvo || !this.equipamentoOriginal) return false;
     return JSON.stringify(this.equipamento) !== JSON.stringify(this.equipamentoOriginal);
   }
 
-  // ESCUTA O F5 OU TENTATIVA DE FECHAR A ABA DO NAVEGADOR
   @HostListener('window:beforeunload', ['$event'])
   aoTentarSair($event: any): void {
     if (this.temAlteracoesPendentes()) {
-      // Define a mensagem para o navegador disparar a caixa de alerta nativa
       $event.returnValue = 'Existem alterações não salvas. Deseja mesmo sair?';
     }
   }
@@ -137,7 +132,7 @@ export class EditarEquipamento implements OnInit {
     this.equipamentoService.atualizar(this.equipamentoId, payload).subscribe({
       next: () => {
         alert('Equipamento atualizado com sucesso!');
-        this.formSalvo = true; // Avisa que salvou com sucesso para não exibir o alerta
+        this.formSalvo = true;
         this.router.navigate(['/equipamento']);
       },
       error: (erro) => console.error('Erro ao atualizar:', erro)
@@ -145,10 +140,9 @@ export class EditarEquipamento implements OnInit {
   }
 
   voltar(): void {
-    // ESCUTA O BOTÃO VOLTAR / CANCELAR DA SUA TELA
     if (this.temAlteracoesPendentes()) {
       const confirmar = confirm('Você tem alterações não salvas. Deseja descartá-las e sair?');
-      if (!confirmar) return; // Se ele cancelar, interrompe a navegação
+      if (!confirmar) return;
     }
 
     this.router.navigate(['/equipamento']);

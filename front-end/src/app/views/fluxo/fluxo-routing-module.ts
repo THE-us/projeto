@@ -6,7 +6,7 @@ import { AnalisarFluxo } from './components/analisar-fluxo/analisar-fluxo';
 const routes: Routes = [
   { path: 'pesquisar', component: PesquisarFluxo },
   { path: 'analisar', component: AnalisarFluxo },
-  { path: '', redirectTo: 'pesquisar', pathMatch: 'full' } // Redireciona para pesquisa por padrão
+  { path: '', redirectTo: 'pesquisar', pathMatch: 'full' }
 ];
 
 @NgModule({

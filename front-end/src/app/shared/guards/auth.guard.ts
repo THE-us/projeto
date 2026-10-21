@@ -8,13 +8,12 @@ export class AuthGuard implements CanActivate {
   constructor(private router: Router) {}
 
   canActivate(): boolean {
-    const token = localStorage.getItem('token'); // Verifica se a sessão anterior ainda existe
+    const token = localStorage.getItem('token');
 
     if (token) {
-      return true; // Deixa o utilizador entrar na tela solicitada
+      return true;
     }
 
-    // Se não tiver token, atira de volta para o login
     this.router.navigate(['/login']);
     return false;
   }
