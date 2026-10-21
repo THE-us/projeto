@@ -36,6 +36,9 @@ export class Login implements OnInit {
       next: (resposta) => {
         localStorage.setItem('token', resposta.accessToken);
 
+        // AVISA A NAVBAR EM TEMPO REAL:
+        this.loginService.notificarLogin(true);
+
         console.log('Login efetuado com sucesso!');
         this.router.navigate(['/equipamento']);
       },
