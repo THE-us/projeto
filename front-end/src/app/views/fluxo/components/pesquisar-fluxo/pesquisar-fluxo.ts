@@ -16,6 +16,7 @@ export class PesquisarFluxo implements OnInit {
   limitePorPagina = 30;
   totalRegistros = 0;
   totalPaginas = 0;
+  paginaDigitada = 1;
 
   filtros: any = {
     dataInicio: '', dataFim: '', horaInicio: '', horaFim: '', placa: '', equipamentoId: ''
@@ -72,6 +73,16 @@ export class PesquisarFluxo implements OnInit {
   mudarPagina(novaPagina: number): void {
     if (novaPagina >= 1 && novaPagina <= this.totalPaginas) {
       this.pesquisar(novaPagina);
+      this.paginaDigitada = novaPagina; // Atualiza o input visualmente
+    }
+  }
+
+  irParaPagina(): void {
+    if (this.paginaDigitada >= 1 && this.paginaDigitada <= this.totalPaginas) {
+      this.mudarPagina(this.paginaDigitada);
+    } else {
+      // Se ele digitar um absurdo (ex: 9999), o sistema reseta para a página atual
+      this.paginaDigitada = this.paginaAtual;
     }
   }
 

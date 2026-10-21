@@ -12,6 +12,13 @@ export class PesquisarEquipamento implements OnInit {
   equipamentos: Equipamento[] = [];
   carregando = false;
 
+  // Variáveis da Paginação
+  paginaAtual = 1;
+  paginaDigitada = 1;
+  limitePorPagina = 10;
+  totalRegistros = 0;
+  totalPaginas = 0;
+
   filtros = {
     codigo: '',
     faixa: '',
@@ -30,37 +37,33 @@ export class PesquisarEquipamento implements OnInit {
       this.filtros = JSON.parse(filtrosSalvos);
     }
 
-    this.pesquisar();
+    this.pesquisar(1);
   }
 
-  pesquisar(): void {
+  pesquisar(paginaDesejada: number = 1): void {
     if (this.carregando) return;
     this.carregando = true;
+    this.paginaAtual = paginaDesejada;
+    this.paginaDigitada = paginaDesejada;
 
     sessionStorage.setItem('filtrosPesquisaEquipamento', JSON.stringify(this.filtros));
 
     const filtrosLimpos: any = {};
-
-    if (this.filtros.codigo && this.filtros.codigo.trim() !== '') {
-      filtrosLimpos.codigo = this.filtros.codigo.trim();
-    }
-
-    if (this.filtros.faixa && this.filtros.faixa.toString().trim() !== '') {
-      filtrosLimpos.faixa = this.filtros.faixa;
-    }
-
-    if (this.filtros.integradorNome && this.filtros.integradorNome.trim() !== '') {
-      filtrosLimpos.integradorNome = this.filtros.integradorNome.trim();
-    }
+    if (this.filtros.codigo && this.filtros.codigo.trim() !== '') filtrosLimpos.codigo = this.filtros.codigo.trim();
+    if (this.filtros.faixa && this.filtros.faixa.toString().trim() !== '') filtrosLimpos.faixa = this.filtros.faixa;
+    if (this.filtros.integradorNome && this.filtros.integradorNome.trim() !== '') filtrosLimpos.integradorNome = this.filtros.integradorNome.trim();
 
     const ativoVal = String(this.filtros.ativo);
     if (ativoVal === '1' || ativoVal === '0') {
       filtrosLimpos.ativo = Number(ativoVal);
     }
 
-    this.equipamentoService.pesquisar(filtrosLimpos).subscribe({
-      next: (dados) => {
-        this.equipamentos = [...dados];
+    this.equipamentoService.pesquisar(filtrosLimpos, this.paginaAtual, this.limitePorPagina).subscribe({
+      next: (resposta) => {
+        this.equipamentos = [...resposta.dados];
+        this.totalRegistros = resposta.totalRegistros;
+        this.totalPaginas = resposta.totalPaginas;
+
         this.carregando = false;
         this.cdr.detectChanges();
       },
@@ -71,10 +74,24 @@ export class PesquisarEquipamento implements OnInit {
     });
   }
 
+  mudarPagina(novaPagina: number): void {
+    if (novaPagina >= 1 && novaPagina <= this.totalPaginas) {
+      this.pesquisar(novaPagina);
+    }
+  }
+
+  irParaPagina(): void {
+    if (this.paginaDigitada >= 1 && this.paginaDigitada <= this.totalPaginas) {
+      this.mudarPagina(this.paginaDigitada);
+    } else {
+      this.paginaDigitada = this.paginaAtual;
+    }
+  }
+
   limparFiltros(): void {
     this.filtros = { codigo: '', faixa: '', ativo: null, integradorNome: '' };
     sessionStorage.removeItem('filtrosPesquisaEquipamento');
-    this.pesquisar();
+    this.pesquisar(1);
   }
 
   excluir(id: number | undefined): void {
@@ -83,8 +100,7 @@ export class PesquisarEquipamento implements OnInit {
     if (confirm('Tem a certeza de que deseja excluir este equipamento?')) {
       this.equipamentoService.excluir(id).subscribe({
         next: () => {
-          this.equipamentos = this.equipamentos.filter(e => e.id !== id);
-          this.cdr.detectChanges();
+          this.pesquisar(this.paginaAtual); // Recarrega a página atual para atualizar os totais
           alert('Equipamento excluído com sucesso!');
         },
         error: (erro) => {

@@ -12,20 +12,22 @@ export class EquipamentoService {
 
   constructor(private http: HttpClient) { }
 
-  pesquisar(filtros: any): Observable<Equipamento[]> {
-    let params = new HttpParams();
+  // Retorna any porque agora recebe um objeto com a paginação e os dados
+  pesquisar(filtros: any, pagina: number = 1, limite: number = 10): Observable<any> {
+    let params = new HttpParams()
+      .set('pagina', pagina.toString())
+      .set('limite', limite.toString());
 
     if (filtros) {
       Object.keys(filtros).forEach(key => {
         const valor = filtros[key];
-
         if (valor !== null && valor !== undefined && valor !== '' && String(valor) !== 'undefined') {
           params = params.set(key, valor);
         }
       });
     }
 
-    return this.http.get<Equipamento[]>(this.baseUrl, { params });
+    return this.http.get<any>(this.baseUrl, { params });
   }
 
   cadastrar(equipamento: Equipamento): Observable<Equipamento> {

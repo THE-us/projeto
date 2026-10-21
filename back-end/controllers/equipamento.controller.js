@@ -17,148 +17,97 @@ const { Op } = require('sequelize');
 const db = require('../db/database');
 
 const schema = {
-    codigo:{
-        in: ['body'],
-        isLength:{
-            options: {min: 1, max: 11},
-        },
-    },
-    faixa:{
-        in: ['body'],
-    },
-    tipo:{
-        in: ['body'],
-    },
-    ativo:{
-        in: ['body'],
-    },
-    local:{
-        in: ['body'],
-    },
-    marca:{
-        in: ['body'],
-    },
-    modelo:{
-        in: ['body'],
-    },
-    velocidadeLimite:{
-        in: ['body'],
-    },
-    dataAfericao:{
-        in: ['body'],
-    },
-    lacre:{
-        in: ['body'],
-    },
-    dataRegistroInmetro:{
-        in: ['body'],
-    },
-    numeroInmetro:{
-        in: ['body'],
-    },
-    integradorId:{
-        in: ['body'],
-    },
-    municipioId:{
-        in: ['body'],
-    },
+    codigo:{ in: ['body'], isLength:{ options: {min: 1, max: 11}, }, },
+    faixa:{ in: ['body'], },
+    tipo:{ in: ['body'], },
+    ativo:{ in: ['body'], },
+    local:{ in: ['body'], },
+    marca:{ in: ['body'], },
+    modelo:{ in: ['body'], },
+    velocidadeLimite:{ in: ['body'], },
+    dataAfericao:{ in: ['body'], },
+    lacre:{ in: ['body'], },
+    dataRegistroInmetro:{ in: ['body'], },
+    numeroInmetro:{ in: ['body'], },
+    integradorId:{ in: ['body'], },
+    municipioId:{ in: ['body'], },
 };
 
-router.post(
-    '/cadastrar',
-    validateSchema(getSchema(schema)),
-    matchedBody(),
-    wrapAsync(async (req, res) => {
-        await create(req, res, EquipamentoService);
-    })
-);
+router.post('/cadastrar', validateSchema(getSchema(schema)), matchedBody(), wrapAsync(async (req, res) => {
+    await create(req, res, EquipamentoService);
+}));
 
-router.post(
-    '/:id',
-    validateParamIdAsIntAndSanitize(),
-    validateSchema(getSchema(schema)),
-    matchedBody(),
-    wrapAsync(async (req, res) => {
-        const { id } = req.params;
-        const value = req.matchedBody || req.body;
-        const service = new EquipamentoService();
+router.post('/:id', validateParamIdAsIntAndSanitize(), validateSchema(getSchema(schema)), matchedBody(), wrapAsync(async (req, res) => {
+    const { id } = req.params;
+    const value = req.matchedBody || req.body;
+    const service = new EquipamentoService();
+    const instance = await service.updateById(id, value);
+    Response.ok(res, instance);
+}));
 
-        const instance = await service.updateById(id, value);
-        Response.ok(res, instance);
-    })
-);
+router.delete('/:id', validateParamIdAsIntAndSanitize(), wrapAsync(async (req, res) => {
+    const { id } = req.params;
+    const service = new EquipamentoService();
+    const deleted = await service.deleteByIdOrThrowError(id); 
+    Response.ok(res, { deleted });
+}));
 
-router.delete(
-    '/:id',
-    validateParamIdAsIntAndSanitize(),
-    wrapAsync(async (req, res) => {
-        const { id } = req.params;
-        const service = new EquipamentoService();
+router.get('/', sqFilter(), wrapAsync(async (req, res) => {
+    // 1. Extraímos também a página e o limite da requisição
+    const { codigo, faixa, ativo, integradorNome, pagina = 1, limite = 10 } = req.query;
+    
+    let whereCond = {};
 
-        const deleted = await service.deleteByIdOrThrowError(id); 
-        
-        Response.ok(res, { deleted });
-    })
-);
+    if (codigo) whereCond.codigo = { [Op.like]: `%${codigo}%` };
+    if (faixa) whereCond.faixa = faixa;
+    if (ativo !== undefined && ativo !== '') whereCond.ativo = ativo;
 
-router.get(
-    '/',
-    sqFilter(),
-    wrapAsync(async (req, res) => {
-        const { codigo, faixa, ativo, integradorNome } = req.query;
-        
-        let whereCond = {};
+    let includeCond = [];
+    const { Integrador } = db.getDatabase();
 
-        if (codigo) {
-            whereCond.codigo = { [Op.like]: `%${codigo}%` };
-        }
-        if (faixa) {
-            whereCond.faixa = faixa;
-        }
-        if (ativo !== undefined && ativo !== '') {
-            whereCond.ativo = ativo;
-        }
-
-        let includeCond = [];
-        const { Integrador } = db.getDatabase();
-
-        // Filtra pelo Nome do Integrador (fazendo JOIN com a tabela Integrador)
-        if (integradorNome) {
-            includeCond.push({
-                model: Integrador,
-                where: {
-                    nome: { [Op.like]: `%${integradorNome}%` }
-                },
-                required: true
-            });
-        } else if (Integrador) {
-            includeCond.push({
-                model: Integrador,
-                required: false
-            });
-        }
-
-        const service = new EquipamentoService();
-        const equipamentos = await service.model.findAll({
-            where: whereCond,
-            include: includeCond
+    if (integradorNome) {
+        includeCond.push({
+            model: Integrador,
+            where: { nome: { [Op.like]: `%${integradorNome}%` } },
+            required: true
         });
+    } else if (Integrador) {
+        includeCond.push({
+            model: Integrador,
+            required: false
+        });
+    }
 
-        Response.ok(res, equipamentos);
-    })
-);
+    // 2. Cálculo da paginação
+    const limit = parseInt(limite) || 10;
+    const page = parseInt(pagina) || 1;
+    const offset = (page - 1) * limit;
 
-router.get(
-    '/:id',
-    validateParamIdAsIntAndSanitize(),
-    sqFilter(),
-    wrapAsync(async (req, res) => {
-        const { id } = req.params;
-        const service = new EquipamentoService();
+    const service = new EquipamentoService();
+    
+    // 3. Usa findAndCountAll para trazer os dados e o total geral
+    const equipamentos = await service.model.findAndCountAll({
+        where: whereCond,
+        include: includeCond,
+        limit: limit,
+        offset: offset,
+        order: [['createdAt', 'DESC']]
+    });
 
-        const instance = await service.findByIdOrThrowError(id);
-        Response.ok(res, instance);
-    })
-);
+    // 4. Retorna a estrutura paginada (Igual ao Fluxo)
+    Response.ok(res, {
+        dados: equipamentos.rows,
+        totalRegistros: equipamentos.count,
+        paginaAtual: page,
+        totalPaginas: Math.ceil(equipamentos.count / limit)
+    });
+}));
+
+router.get('/:id', validateParamIdAsIntAndSanitize(), sqFilter(), wrapAsync(async (req, res) => {
+    const { id } = req.params;
+    const service = new EquipamentoService();
+    const instance = await service.findByIdOrThrowError(id);
+    Response.ok(res, instance);
+}));
 
 module.exports = router;

@@ -133,3 +133,20 @@
     }
   }
 }
+
+.input-pagina {
+    width: 60px;
+    text-align: center;
+    padding: 4px;
+    margin: 0 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-weight: bold;
+    // Remove as setinhas feias do input number em alguns navegadores
+    -moz-appearance: textfield;
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+  }

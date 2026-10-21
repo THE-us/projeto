@@ -85,7 +85,15 @@
       </button>
 
       <span class="pagina-atual">
-        Página {{ paginaAtual }} de {{ totalPaginas }}
+        Página
+        <input type="number"
+               class="input-pagina"
+               [(ngModel)]="paginaDigitada"
+               (keyup.enter)="irParaPagina()"
+               (blur)="irParaPagina()"
+               min="1"
+               [max]="totalPaginas">
+        de {{ totalPaginas }}
       </span>
 
       <button class="btn-cinza" [disabled]="paginaAtual === totalPaginas" (click)="mudarPagina(paginaAtual + 1)">

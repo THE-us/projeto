@@ -75,3 +75,54 @@ button {
     font-size: 14px;
   }
 }
+
+.paginacao-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+
+  .info-paginacao {
+    color: #666;
+    font-size: 0.9rem;
+  }
+
+  .controles-paginacao {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+
+    button {
+      padding: 8px 16px;
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    }
+
+    .pagina-atual {
+      font-weight: bold;
+      color: #333;
+
+      .input-pagina {
+        width: 60px;
+        text-align: center;
+        padding: 4px;
+        margin: 0 5px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-weight: bold;
+        // Remove as setinhas feias do input number
+        -moz-appearance: textfield;
+        &::-webkit-outer-spin-button,
+        &::-webkit-inner-spin-button {
+          -webkit-appearance: none;
+          margin: 0;
+        }
+      }
+    }
+  }
+}

@@ -1,5 +1,5 @@
 <div class="container" style="padding: 20px; background-color: #e5e7e9; min-height: 100vh;">
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
     <h2 style="color: #2c3e50; font-weight: 400; margin: 0;">Pesquisar Equipamento</h2>
     <button class="btn-azul" routerLink="/equipamento/novo">+ Novo Equipamento</button>
   </div>
@@ -34,7 +34,6 @@
 
         <div class="acoes-filtro">
           <button type="submit" class="btn-azul">Pesquisar</button>
-
           <button type="button" class="btn-cinza" (click)="limparFiltros()">Limpar</button>
         </div>
 
@@ -42,7 +41,7 @@
     </form>
   </div>
 
-  <table border="1" cellpadding="12" cellspacing="0" class="tabela-dados">
+  <table border="1" cellpadding="12" cellspacing="0" class="tabela-dados" *ngIf="equipamentos.length > 0">
     <thead>
       <tr>
         <th>Código</th>
@@ -75,4 +74,32 @@
   <div *ngIf="equipamentos.length === 0" style="margin-top: 20px; color: #7f8c8d;">
     Nenhum equipamento encontrado com os filtros informados.
   </div>
-</div>
+
+  <!-- PAGINAÇÃO -->
+  <div class="paginacao-container" *ngIf="totalRegistros > 0">
+    <div class="info-paginacao">
+      Exibindo {{ equipamentos.length }} de <b>{{ totalRegistros }}</b> equipamentos.
+    </div>
+
+    <div class="controles-paginacao">
+      <button class="btn-cinza" [disabled]="paginaAtual === 1" (click)="mudarPagina(paginaAtual - 1)">
+        &laquo; Anterior
+      </button>
+
+      <span class="pagina-atual">
+        Página
+        <input type="number"
+               class="input-pagina"
+               [(ngModel)]="paginaDigitada"
+               (keyup.enter)="irParaPagina()"
+               (blur)="irParaPagina()"
+               min="1"
+               [max]="totalPaginas">
+        de {{ totalPaginas }}
+      </span>
+
+      <button class="btn-cinza" [disabled]="paginaAtual === totalPaginas" (click)="mudarPagina(paginaAtual + 1)">
+        Próxima &raquo;
+      </button>
+    </div>
+  </div>
