@@ -1,4 +1,4 @@
-import { Component, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { FluxoService } from '../../services/fluxo';
 
 @Component({
@@ -7,7 +7,7 @@ import { FluxoService } from '../../services/fluxo';
   templateUrl: './pesquisar-fluxo.html',
   styleUrl: './pesquisar-fluxo.scss'
 })
-export class PesquisarFluxo {
+export class PesquisarFluxo implements OnInit {
   fluxos: any[] = [];
   carregando = false;
 
@@ -15,8 +15,20 @@ export class PesquisarFluxo {
     dataInicio: '', dataFim: '', horaInicio: '', horaFim: '', placa: '', equipamentoId: ''
   };
 
-  // Injetamos o ChangeDetectorRef aqui
   constructor(private fluxoService: FluxoService, private cdr: ChangeDetectorRef) {}
+
+  ngOnInit(): void {
+    // 1. TENTA RECUPERAR A ÚLTIMA PESQUISA DE FLUXOS
+    const filtrosSalvos = sessionStorage.getItem('filtrosPesquisaFluxo');
+    if (filtrosSalvos) {
+      this.filtros = JSON.parse(filtrosSalvos);
+
+      // Se houver algum filtro restaurado, já faz a pesquisa automaticamente
+      if (this.temFiltroPreenchido()) {
+        this.pesquisar();
+      }
+    }
+  }
 
   temFiltroPreenchido(): boolean {
     return Object.values(this.filtros).some(valor => valor !== null && valor !== '');
@@ -30,6 +42,9 @@ export class PesquisarFluxo {
 
     if (this.carregando) return;
     this.carregando = true;
+
+    // 2. GUARDA OS FILTROS ATUAIS NA MEMÓRIA
+    sessionStorage.setItem('filtrosPesquisaFluxo', JSON.stringify(this.filtros));
 
     this.fluxoService.pesquisar(this.filtros).subscribe({
       next: (dados) => {
@@ -48,6 +63,9 @@ export class PesquisarFluxo {
   limparFiltros(): void {
     this.filtros = { dataInicio: '', dataFim: '', horaInicio: '', horaFim: '', placa: '', equipamentoId: '' };
     this.fluxos = [];
+
+    // 3. APAGA A PESQUISA DA MEMÓRIA
+    sessionStorage.removeItem('filtrosPesquisaFluxo');
     this.cdr.detectChanges();
   }
 }

@@ -18,11 +18,20 @@ export class AnalisarFluxo implements OnInit {
   constructor(private fluxoService: FluxoService) {}
 
   ngOnInit(): void {
-    // Carrega o total geral de fluxos por equipamento ao abrir a tela, conforme o requisito 4
+    // 1. TENTA RECUPERAR A ÚLTIMA ANÁLISE FEITA
+    const filtrosSalvos = sessionStorage.getItem('filtrosAnaliseFluxo');
+    if (filtrosSalvos) {
+      this.filtros = JSON.parse(filtrosSalvos);
+    }
+
+    // Carrega o total geral (ou os dados com os filtros restaurados) ao abrir a tela
     this.carregarAnalise();
   }
 
   carregarAnalise(): void {
+    // 2. GUARDA OS FILTROS ATUAIS NA MEMÓRIA
+    sessionStorage.setItem('filtrosAnaliseFluxo', JSON.stringify(this.filtros));
+
     this.fluxoService.analisar(this.filtros).subscribe({
       next: (dados) => {
         this.dadosAnalise = dados;
@@ -40,6 +49,8 @@ export class AnalisarFluxo implements OnInit {
 
   limparFiltros(): void {
     this.filtros = { dataInicio: '', dataFim: '' };
+    // 3. APAGA OS FILTROS DA MEMÓRIA
+    sessionStorage.removeItem('filtrosAnaliseFluxo');
     this.carregarAnalise(); // Recarrega sem filtros para mostrar o total geral novamente
   }
 }
