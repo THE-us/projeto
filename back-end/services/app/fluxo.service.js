@@ -11,13 +11,17 @@ class FluxoService extends BaseCrudService{
     }
 
     async pesquisar(filtros) {
-        const db = database.getDatabase(); // Necessário para acessar o modelo Equipamento
+        const db = database.getDatabase();
         const where = {};
         const includeEquipamentoWhere = {};
         let temFiltroEquipamento = false;
 
+        // A CORREÇÃO: Forçando as horas limites para anular o corte do UTC do Sequelize
         if (filtros.dataInicio && filtros.dataFim) {
-            where.data = { [Op.between]: [filtros.dataInicio, filtros.dataFim] };
+            where.data = {
+                [Op.gte]: filtros.dataInicio + ' 00:00:00',
+                [Op.lte]: filtros.dataFim + ' 23:59:59'
+            };
         }
 
         if (filtros.horaInicio && filtros.horaFim) {
@@ -26,7 +30,6 @@ class FluxoService extends BaseCrudService{
 
         if (filtros.placa) where.placa = filtros.placa;
 
-        // Novos filtros baseados no PDF
         if (filtros.equipamentoCodigo) {
             includeEquipamentoWhere.codigo = { [Op.like]: `%${filtros.equipamentoCodigo}%` };
             temFiltroEquipamento = true;
@@ -53,9 +56,9 @@ class FluxoService extends BaseCrudService{
             include: [
                 {
                     model: db.Equipamento,
-                    attributes: ['id', 'codigo', 'faixa'], // Traz esses dados para a tela
+                    attributes: ['id', 'codigo', 'faixa'],
                     where: Object.keys(includeEquipamentoWhere).length > 0 ? includeEquipamentoWhere : undefined,
-                    required: temFiltroEquipamento // Se tiver filtro, obriga a achar. Se não, traz tudo.
+                    required: temFiltroEquipamento
                 }
             ]
         });
