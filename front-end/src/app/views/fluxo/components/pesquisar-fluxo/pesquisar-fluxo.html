@@ -2,7 +2,7 @@
   <h2>Pesquisar Fluxos</h2>
 
   <div class="filtros-card">
-    <form (ngSubmit)="pesquisar()">
+    <form (ngSubmit)="pesquisar(1)" #formPesquisa="ngForm">
       <div class="grid-filtros">
         <div class="form-group">
           <label>Data Início</label>
@@ -30,8 +30,13 @@
         </div>
 
         <div class="form-group">
-          <label>ID Equipamento</label>
-          <input type="number" name="equipamentoId" [(ngModel)]="filtros.equipamentoId" placeholder="Ex: 1">
+          <label>Código do Equipamento</label>
+          <input type="text" name="equipamentoCodigo" [(ngModel)]="filtros.equipamentoCodigo" placeholder="Ex: 0000000">
+        </div>
+
+        <div class="form-group">
+          <label>Faixa</label>
+          <input type="number" name="equipamentoFaixa" [(ngModel)]="filtros.equipamentoFaixa" placeholder="Ex: 1">
         </div>
       </div>
 
@@ -42,8 +47,11 @@
     </form>
   </div>
 
-<table class="tabela-dados" *ngIf="fluxos.length > 0">
-    <!-- ... O SEU THEAD E TBODY CONTINUAM IGUAIS AQUI ... -->
+  <div *ngIf="carregando" style="text-align: center; padding: 30px; color: #3498db; font-weight: bold;">
+    A pesquisar fluxos... Aguarde.
+  </div>
+
+  <table class="tabela-dados" *ngIf="fluxos.length > 0 && !carregando">
     <thead>
       <tr>
         <th>ID</th>
@@ -52,7 +60,8 @@
         <th>Placa</th>
         <th>Velocidade</th>
         <th>Classe</th>
-        <th>ID Equip.</th>
+        <th>Cód. Equip.</th>
+        <th>Faixa</th>
       </tr>
     </thead>
     <tbody>
@@ -63,18 +72,19 @@
         <td><b>{{ f.placa }}</b></td>
         <td>{{ f.velMed }} km/h</td>
         <td>{{ f.classVeic }}</td>
-        <td>{{ f.equipamentoId }}</td>
+        <td>{{ f.Equipamento?.codigo || f.equipamentoId }}</td>
+        <td>{{ f.Equipamento?.faixa || '-' }}</td>
       </tr>
     </tbody>
   </table>
 
   <!-- SE NÃO TIVER DADOS -->
-  <div *ngIf="fluxos.length === 0" class="mensagem-vazia">
+  <div *ngIf="fluxos.length === 0 && !carregando" class="mensagem-vazia">
     Utilize os filtros acima para pesquisar os fluxos registados.
   </div>
 
   <!-- A MÁGICA DA PAGINAÇÃO ENTRA AQUI -->
-  <div class="paginacao-container" *ngIf="totalRegistros > 0">
+  <div class="paginacao-container" *ngIf="totalRegistros > 0 && !carregando">
     <div class="info-paginacao">
       Exibindo {{ fluxos.length }} de <b>{{ totalRegistros }}</b> fluxos encontrados.
     </div>

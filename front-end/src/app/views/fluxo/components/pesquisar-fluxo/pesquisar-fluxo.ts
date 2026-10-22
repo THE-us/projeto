@@ -1,4 +1,5 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
+import { NgForm } from '@angular/forms';
 import { FluxoService } from '../../services/fluxo';
 
 @Component({
@@ -8,6 +9,9 @@ import { FluxoService } from '../../services/fluxo';
   styleUrl: './pesquisar-fluxo.scss'
 })
 export class PesquisarFluxo implements OnInit {
+  // Captura o formulário HTML para garantir a limpeza total de campos inválidos (como datas incompletas)
+  @ViewChild('formPesquisa') formPesquisa!: NgForm;
+
   fluxos: any[] = [];
   carregando = false;
 
@@ -18,8 +22,9 @@ export class PesquisarFluxo implements OnInit {
   totalPaginas = 0;
   paginaDigitada = 1;
 
+  // Filtros atualizados (removido equipamentoId e adicionados Código e Faixa)
   filtros: any = {
-    dataInicio: '', dataFim: '', horaInicio: '', horaFim: '', placa: '', equipamentoId: ''
+    dataInicio: '', dataFim: '', horaInicio: '', horaFim: '', placa: '', equipamentoCodigo: '', equipamentoFaixa: ''
   };
 
   constructor(private fluxoService: FluxoService, private cdr: ChangeDetectorRef) {}
@@ -38,7 +43,6 @@ export class PesquisarFluxo implements OnInit {
     return Object.values(this.filtros).some(valor => valor !== null && valor !== '');
   }
 
-  // Agora recebe a página que o utilizador quer ver
   pesquisar(paginaDesejada: number = 1): void {
     if (!this.temFiltroPreenchido()) {
       alert('Atenção: É obrigatório informar pelo menos um filtro.');
@@ -51,10 +55,8 @@ export class PesquisarFluxo implements OnInit {
 
     sessionStorage.setItem('filtrosPesquisaFluxo', JSON.stringify(this.filtros));
 
-    // Envia a página atual e o limite para o serviço
     this.fluxoService.pesquisar(this.filtros, this.paginaAtual, this.limitePorPagina).subscribe({
       next: (resposta) => {
-        // Extrai os dados do novo formato JSON do Backend
         this.fluxos = [...resposta.dados];
         this.totalRegistros = resposta.totalRegistros;
         this.totalPaginas = resposta.totalPaginas;
@@ -73,7 +75,7 @@ export class PesquisarFluxo implements OnInit {
   mudarPagina(novaPagina: number): void {
     if (novaPagina >= 1 && novaPagina <= this.totalPaginas) {
       this.pesquisar(novaPagina);
-      this.paginaDigitada = novaPagina; // Atualiza o input visualmente
+      this.paginaDigitada = novaPagina;
     }
   }
 
@@ -81,13 +83,17 @@ export class PesquisarFluxo implements OnInit {
     if (this.paginaDigitada >= 1 && this.paginaDigitada <= this.totalPaginas) {
       this.mudarPagina(this.paginaDigitada);
     } else {
-      // Se ele digitar um absurdo (ex: 9999), o sistema reseta para a página atual
       this.paginaDigitada = this.paginaAtual;
     }
   }
 
   limparFiltros(): void {
-    this.filtros = { dataInicio: '', dataFim: '', horaInicio: '', horaFim: '', placa: '', equipamentoId: '' };
+    // Força o reset nativo do HTML antes de limpar o modelo
+    if (this.formPesquisa) {
+      this.formPesquisa.resetForm();
+    }
+
+    this.filtros = { dataInicio: '', dataFim: '', horaInicio: '', horaFim: '', placa: '', equipamentoCodigo: '', equipamentoFaixa: '' };
     this.fluxos = [];
     this.totalRegistros = 0;
     this.totalPaginas = 0;

@@ -11,7 +11,10 @@ class FluxoService extends BaseCrudService{
     }
 
     async pesquisar(filtros) {
+        const db = database.getDatabase(); // Necessário para acessar o modelo Equipamento
         const where = {};
+        const includeEquipamentoWhere = {};
+        let temFiltroEquipamento = false;
 
         if (filtros.dataInicio && filtros.dataFim) {
             where.data = { [Op.between]: [filtros.dataInicio, filtros.dataFim] };
@@ -22,30 +25,44 @@ class FluxoService extends BaseCrudService{
         }
 
         if (filtros.placa) where.placa = filtros.placa;
-        if (filtros.equipamentoId) where.equipamentoId = filtros.equipamentoId;
 
-        const temFiltro = Object.keys(where).length > 0;
-        if (!temFiltro) {
+        // Novos filtros baseados no PDF
+        if (filtros.equipamentoCodigo) {
+            includeEquipamentoWhere.codigo = { [Op.like]: `%${filtros.equipamentoCodigo}%` };
+            temFiltroEquipamento = true;
+        }
+        if (filtros.equipamentoFaixa) {
+            includeEquipamentoWhere.faixa = filtros.equipamentoFaixa;
+            temFiltroEquipamento = true;
+        }
+
+        const temFiltroFluxo = Object.keys(where).length > 0;
+        if (!temFiltroFluxo && !temFiltroEquipamento) {
             throw new Error('É necessário informar pelo menos um filtro para a pesquisa.');
         }
 
-        // --- LÓGICA DE PAGINAÇÃO ---
         const pagina = parseInt(filtros.pagina) || 1;
         const limite = parseInt(filtros.limite) || 30;
         const salto = (pagina - 1) * limite;
 
-        // findAndCountAll traz os dados E o total geral do banco
         const resultados = await this.model.findAndCountAll({
             where: where,
             limit: limite,
             offset: salto,
-            order: [['data', 'DESC'], ['hora', 'DESC']]
+            order: [['data', 'DESC'], ['hora', 'DESC']],
+            include: [
+                {
+                    model: db.Equipamento,
+                    attributes: ['id', 'codigo', 'faixa'], // Traz esses dados para a tela
+                    where: Object.keys(includeEquipamentoWhere).length > 0 ? includeEquipamentoWhere : undefined,
+                    required: temFiltroEquipamento // Se tiver filtro, obriga a achar. Se não, traz tudo.
+                }
+            ]
         });
 
-        // Retorna um objeto estruturado para o Front-end
         return {
-            dados: resultados.rows,          // As 30 linhas da tabela
-            totalRegistros: resultados.count, // Ex: 65.430
+            dados: resultados.rows,
+            totalRegistros: resultados.count,
             paginaAtual: pagina,
             totalPaginas: Math.ceil(resultados.count / limite)
         };
