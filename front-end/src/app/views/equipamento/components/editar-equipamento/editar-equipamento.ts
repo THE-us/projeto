@@ -125,8 +125,30 @@ export class EditarEquipamento implements OnInit {
 
   salvar(): void {
     const payload = { ...this.equipamento };
-    if (!payload.dataAfericao) payload.dataAfericao = null;
-    if (!payload.dataRegistroInmetro) payload.dataRegistroInmetro = null;
+    payload.marca = this.buscaIntegrador;
+
+    const anoMinimo = 2000;
+    const anoMaximo = 2030;
+
+    const validarData = (dataStr: string, nomeCampo: string): string | null => {
+      if (!dataStr) return null;
+      const ano = new Date(dataStr).getFullYear();
+      if (ano < anoMinimo || ano > anoMaximo) {
+        const aceitaNulo = confirm(`A data de ${nomeCampo} (Ano: ${ano}) está fora do limite permitido (${anoMinimo}-${anoMaximo}). Deseja salvá-la em branco (null)? Se clicar em Cancelar, você poderá corrigir a data.`);
+        if (aceitaNulo) return null;
+        return 'INTERROMPER_SALVAMENTO';
+      }
+      return dataStr;
+    };
+
+    const afericaoValidada = validarData(payload.dataAfericao, 'Aferição');
+    if (afericaoValidada === 'INTERROMPER_SALVAMENTO') return;
+    payload.dataAfericao = afericaoValidada;
+
+    const inmetroValidado = validarData(payload.dataRegistroInmetro, 'Registro Inmetro');
+    if (inmetroValidado === 'INTERROMPER_SALVAMENTO') return;
+    payload.dataRegistroInmetro = inmetroValidado;
+
     if (!payload.numeroInmetro) payload.numeroInmetro = null;
 
     this.equipamentoService.atualizar(this.equipamentoId, payload).subscribe({
@@ -135,7 +157,10 @@ export class EditarEquipamento implements OnInit {
         this.formSalvo = true;
         this.router.navigate(['/equipamento']);
       },
-      error: (erro) => console.error('Erro ao atualizar:', erro)
+      error: (erro) => {
+        console.error('Erro ao atualizar:', erro);
+        alert('Erro ao salvar o equipamento. Verifique se algum campo excedeu o limite máximo de caracteres ou se há dados duplicados.');
+      }
     });
   }
 
