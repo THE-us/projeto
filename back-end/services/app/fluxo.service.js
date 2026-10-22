@@ -55,25 +55,29 @@ class FluxoService extends BaseCrudService{
         const db = database.getDatabase();
         const where = {};
 
+        // Força a inclusão de hora para anular a conversão UTC do Sequelize
         if (filtros.dataInicio && filtros.dataFim) {
             where.data = {
-                [Op.between]: [filtros.dataInicio, filtros.dataFim]
+                [Op.gte]: filtros.dataInicio + ' 00:00:00',
+                [Op.lte]: filtros.dataFim + ' 23:59:59'
             };
         }
 
         const resultados = await this.model.findAll({
             where: where,
             attributes: [
-                'equipamentoId', 
+                'equipamentoId',
                 [db.sequelize.fn('COUNT', db.sequelize.col('Fluxo.id')), 'totalFluxos']
             ],
-            group: ['equipamentoId'],
             include: [
                 {
-                    model: db.Equipamento, 
-                    attributes: ['id', 'codigo', 'faixa']
+                    model: db.Equipamento,
+                    attributes: ['id', 'codigo', 'faixa'] 
                 }
-            ]
+            ],
+            // Agrupamento estrito para evitar crashes 500 no MySQL 8
+            group: ['Fluxo.equipamentoId', 'Equipamento.id', 'Equipamento.codigo', 'Equipamento.faixa'],
+            order: [[db.sequelize.literal('totalFluxos'), 'DESC']]
         });
 
         return resultados;
