@@ -19,45 +19,54 @@
 
       <div class="acoes-filtro">
         <button type="submit" class="btn-azul" [disabled]="carregando">Filtrar Intervalo</button>
-        <button type="button" class="btn-cinza" (click)="limparFiltros()" [disabled]="carregando">Mostrar Total Geral</button>
+        <button type="button" class="btn-cinza" (click)="mostrarTotalGeral()" [disabled]="carregando">Mostrar Total Geral</button>
+        <button type="button" class="btn-cinza" (click)="limparFiltros()" [disabled]="carregando">Limpar</button>
       </div>
     </form>
   </div>
 
-  <div style="margin: 15px 0; padding: 10px; background-color: #d4e6f1; border-left: 4px solid #3498db; border-radius: 4px; color: #2980b9;">
-    <b *ngIf="vendoTotalGeral">Exibindo o total histórico de passagens de todos os tempos.</b>
-    <b *ngIf="!vendoTotalGeral">Exibindo a análise entre as datas {{ filtros.dataInicio | date:'dd/MM/yyyy' }} e {{ filtros.dataFim | date:'dd/MM/yyyy' }}.</b>
-  </div>
+  <!-- Envolvemos tudo numa tag invisível do Angular que só existe se a pesquisa foi acionada -->
+  <ng-container *ngIf="pesquisaRealizada">
+    <div style="margin: 15px 0; padding: 10px; background-color: #d4e6f1; border-left: 4px solid #3498db; border-radius: 4px; color: #2980b9;">
+      <b *ngIf="vendoTotalGeral">Exibindo o total histórico de passagens de todos os tempos.</b>
+      <b *ngIf="!vendoTotalGeral">Exibindo a análise entre as datas {{ filtros.dataInicio | date:'dd/MM/yyyy' }} e {{ filtros.dataFim | date:'dd/MM/yyyy' }}.</b>
+    </div>
 
-  <!-- AVISO DE CARREGAMENTO -->
-  <div *ngIf="carregando" style="text-align: center; padding: 40px; color: #3498db; font-weight: bold;">
-    <p>A processar dados no servidor... Aguarde.</p>
-  </div>
+    <div *ngIf="carregando" style="text-align: center; padding: 40px; color: #3498db; font-weight: bold;">
+      <p>A processar dados no servidor... Aguarde.</p>
+    </div>
 
-  <table class="tabela-dados" *ngIf="dadosAnalise.length > 0 && !carregando">
-    <thead>
-      <tr>
-        <th style="text-align: center; width: 80px;">Ranking</th>
-        <th>ID Equipamento</th>
-        <th>Código do Equipamento</th>
-        <th>Faixa</th>
-        <th>Quantidade de Fluxos</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let item of dadosAnalise; let i = index">
-        <td style="text-align: center; font-size: 1.1em;"><b>#{{ i + 1 }}</b></td>
-        <td>{{ item.equipamentoId }}</td>
-        <td><b>{{ item.Equipamento?.codigo || 'N/D' }}</b></td>
-        <td>{{ item.Equipamento?.faixa || 'N/D' }}</td>
-        <td class="destaque-total">{{ item.totalFluxos | number }} passagens</td>
-      </tr>
-    </tbody>
-  </table>
+    <table class="tabela-dados" *ngIf="dadosAnalise.length > 0 && !carregando">
+      <thead>
+        <tr>
+          <th style="text-align: center; width: 80px;">Ranking</th>
+          <th>ID Equipamento</th>
+          <th>Código do Equipamento</th>
+          <th>Faixa</th>
+          <th>Quantidade de Fluxos</th>
+          <th style="text-align: center;">Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of dadosAnalise; let i = index">
+          <td style="text-align: center; font-size: 1.1em;"><b>#{{ i + 1 }}</b></td>
+          <td>{{ item.equipamentoId }}</td>
+          <td><b>{{ item.Equipamento?.codigo || 'N/D' }}</b></td>
+          <td>{{ item.Equipamento?.faixa || 'N/D' }}</td>
+          <td class="destaque-total">{{ item.totalFluxos | number }} passagens</td>
+          <td style="text-align: center;">
+            <!-- O botão mágico de teletransporte -->
+            <button type="button" class="btn-azul" style="padding: 6px 12px; font-size: 0.9em;" (click)="verPassagens(item)">
+              Ver Passagens
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
 
-  <!-- MENSAGEM VAZIA CONDICIONADA (SÓ APARECE SE NÃO ESTIVER A CARREGAR) -->
-  <div *ngIf="dadosAnalise.length === 0 && !carregando" class="mensagem-vazia">
-    <span *ngIf="!vendoTotalGeral">Nenhum fluxo encontrado para o intervalo de datas selecionado.</span>
-    <span *ngIf="vendoTotalGeral">O banco de dados ainda não possui registos consolidados.</span>
-  </div>
+    <div *ngIf="dadosAnalise.length === 0 && !carregando" class="mensagem-vazia">
+      <span *ngIf="!vendoTotalGeral">Nenhum fluxo encontrado para o intervalo de datas selecionado.</span>
+      <span *ngIf="vendoTotalGeral">O banco de dados ainda não possui registos consolidados.</span>
+    </div>
+  </ng-container>
 </div>

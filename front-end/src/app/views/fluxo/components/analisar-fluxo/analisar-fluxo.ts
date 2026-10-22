@@ -1,4 +1,5 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Router } from '@angular/router';
 import { FluxoService } from '../../services/fluxo';
 
 @Component({
@@ -10,7 +11,10 @@ import { FluxoService } from '../../services/fluxo';
 export class AnalisarFluxo implements OnInit {
   dadosAnalise: any[] = [];
   carregando = false;
-  vendoTotalGeral = true;
+  vendoTotalGeral = false;
+
+  // Flag para controlar se a tela deve exibir resultados/mensagens
+  pesquisaRealizada = false;
 
   filtros = {
     dataInicio: '',
@@ -19,18 +23,23 @@ export class AnalisarFluxo implements OnInit {
 
   constructor(
     private fluxoService: FluxoService,
-    private cdr: ChangeDetectorRef // Injetado para forçar a renderização
+    private cdr: ChangeDetectorRef,
+    private router: Router // Injetado para navegar entre as telas
   ) {}
 
   ngOnInit(): void {
     const filtrosSalvos = sessionStorage.getItem('filtrosAnaliseFluxo');
     if (filtrosSalvos) {
       this.filtros = JSON.parse(filtrosSalvos);
+      this.pesquisaRealizada = true;
       if (this.filtros.dataInicio || this.filtros.dataFim) {
         this.vendoTotalGeral = false;
+      } else {
+        this.vendoTotalGeral = true;
       }
+      this.carregarAnalise();
     }
-    this.carregarAnalise();
+    // Se não houver filtros salvos, a tela permanece 100% limpa (não chama carregarAnalise)
   }
 
   carregarAnalise(): void {
@@ -41,13 +50,13 @@ export class AnalisarFluxo implements OnInit {
       next: (dados) => {
         this.dadosAnalise = dados;
         this.carregando = false;
-        this.cdr.detectChanges(); // Acorda a tela instantaneamente quando os dados chegam
+        this.cdr.detectChanges();
       },
       error: (erro) => {
         console.error('Erro ao carregar análise de fluxos:', erro);
         alert('Erro ao processar a análise no servidor.');
         this.carregando = false;
-        this.cdr.detectChanges(); // Acorda a tela também em caso de erro
+        this.cdr.detectChanges();
       }
     });
   }
@@ -58,13 +67,43 @@ export class AnalisarFluxo implements OnInit {
       return;
     }
     this.vendoTotalGeral = false;
+    this.pesquisaRealizada = true;
+    this.carregarAnalise();
+  }
+
+  mostrarTotalGeral(): void {
+    this.filtros = { dataInicio: '', dataFim: '' };
+    this.vendoTotalGeral = true;
+    this.pesquisaRealizada = true;
     this.carregarAnalise();
   }
 
   limparFiltros(): void {
+    // Apenas limpa a memória e esconde os resultados, voltando ao estado inicial
     this.filtros = { dataInicio: '', dataFim: '' };
-    this.vendoTotalGeral = true;
+    this.dadosAnalise = [];
+    this.vendoTotalGeral = false;
+    this.pesquisaRealizada = false;
     sessionStorage.removeItem('filtrosAnaliseFluxo');
-    this.carregarAnalise();
+    this.cdr.detectChanges();
+  }
+
+  verPassagens(item: any): void {
+    // Constrói o objeto de filtros exigido pela tela de Pesquisar Fluxo
+    const filtrosPesquisa = {
+      dataInicio: this.filtros.dataInicio || '',
+      dataFim: this.filtros.dataFim || '',
+      horaInicio: '',
+      horaFim: '',
+      placa: '',
+      equipamentoCodigo: item.Equipamento?.codigo || '',
+      equipamentoFaixa: item.Equipamento?.faixa || ''
+    };
+
+    // Salva na memória fingindo que o utilizador digitou isso na outra tela
+    sessionStorage.setItem('filtrosPesquisaFluxo', JSON.stringify(filtrosPesquisa));
+
+    // Redireciona para a tela de Pesquisar Fluxo (Ajuste o caminho se a sua rota for diferente de '/fluxo')
+    this.router.navigate(['/fluxo']);
   }
 }
