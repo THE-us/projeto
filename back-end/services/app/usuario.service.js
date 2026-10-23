@@ -30,7 +30,6 @@ class UsuarioService extends BaseCrudService{
     }
 
     async alterarSenha(id, values){
-        // Assumindo que findByIdOrThrowError vem do seu BaseCrudService. Se der erro no futuro, trocamos para findByPk.
         const usuario = await this.findByIdOrThrowError(id);
         usuario.senha = values.senha;
         await usuario.save();

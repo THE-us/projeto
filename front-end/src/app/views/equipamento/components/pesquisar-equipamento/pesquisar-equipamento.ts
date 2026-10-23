@@ -100,7 +100,7 @@ export class PesquisarEquipamento implements OnInit {
     if (confirm('Tem a certeza de que deseja excluir este equipamento?')) {
       this.equipamentoService.excluir(id).subscribe({
         next: () => {
-          this.pesquisar(this.paginaAtual); // Recarrega a página atual para atualizar os totais
+          this.pesquisar(this.paginaAtual);
           alert('Equipamento excluído com sucesso!');
         },
         error: (erro) => {

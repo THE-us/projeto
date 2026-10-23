@@ -16,7 +16,6 @@ class FluxoService extends BaseCrudService{
         const includeEquipamentoWhere = {};
         let temFiltroEquipamento = false;
 
-        // A CORREÇÃO: Forçando as horas limites para anular o corte do UTC do Sequelize
         if (filtros.dataInicio && filtros.dataFim) {
             where.data = {
                 [Op.gte]: filtros.dataInicio + ' 00:00:00',
@@ -75,7 +74,6 @@ class FluxoService extends BaseCrudService{
         const db = database.getDatabase();
         const where = {};
 
-        // Força a inclusão de hora para anular a conversão UTC do Sequelize
         if (filtros.dataInicio && filtros.dataFim) {
             where.data = {
                 [Op.gte]: filtros.dataInicio + ' 00:00:00',
@@ -95,7 +93,6 @@ class FluxoService extends BaseCrudService{
                     attributes: ['id', 'codigo', 'faixa'] 
                 }
             ],
-            // Agrupamento estrito para evitar crashes 500 no MySQL 8
             group: ['Fluxo.equipamentoId', 'Equipamento.id', 'Equipamento.codigo', 'Equipamento.faixa'],
             order: [[db.sequelize.literal('totalFluxos'), 'DESC']]
         });

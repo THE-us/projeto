@@ -25,7 +25,6 @@
     </form>
   </div>
 
-  <!-- Envolvemos tudo numa tag invisível do Angular que só existe se a pesquisa foi acionada -->
   <ng-container *ngIf="pesquisaRealizada">
     <div style="margin: 15px 0; padding: 10px; background-color: #d4e6f1; border-left: 4px solid #3498db; border-radius: 4px; color: #2980b9;">
       <b *ngIf="vendoTotalGeral">Exibindo o total histórico de passagens de todos os tempos.</b>
@@ -55,7 +54,6 @@
           <td>{{ item.Equipamento?.faixa || 'N/D' }}</td>
           <td class="destaque-total">{{ item.totalFluxos | number }} passagens</td>
           <td style="text-align: center;">
-            <!-- O botão mágico de teletransporte -->
             <button type="button" class="btn-azul" style="padding: 6px 12px; font-size: 0.9em;" (click)="verPassagens(item)">
               Ver Passagens
             </button>

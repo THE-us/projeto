@@ -13,7 +13,6 @@ export class AnalisarFluxo implements OnInit {
   carregando = false;
   vendoTotalGeral = false;
 
-  // Flag para controlar se a tela deve exibir resultados/mensagens
   pesquisaRealizada = false;
 
   filtros = {
@@ -24,7 +23,7 @@ export class AnalisarFluxo implements OnInit {
   constructor(
     private fluxoService: FluxoService,
     private cdr: ChangeDetectorRef,
-    private router: Router // Injetado para navegar entre as telas
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -39,7 +38,6 @@ export class AnalisarFluxo implements OnInit {
       }
       this.carregarAnalise();
     }
-    // Se não houver filtros salvos, a tela permanece 100% limpa (não chama carregarAnalise)
   }
 
   carregarAnalise(): void {
@@ -79,7 +77,6 @@ export class AnalisarFluxo implements OnInit {
   }
 
   limparFiltros(): void {
-    // Apenas limpa a memória e esconde os resultados, voltando ao estado inicial
     this.filtros = { dataInicio: '', dataFim: '' };
     this.dadosAnalise = [];
     this.vendoTotalGeral = false;
@@ -89,7 +86,6 @@ export class AnalisarFluxo implements OnInit {
   }
 
   verPassagens(item: any): void {
-    // Constrói o objeto de filtros exigido pela tela de Pesquisar Fluxo
     const filtrosPesquisa = {
       dataInicio: this.filtros.dataInicio || '',
       dataFim: this.filtros.dataFim || '',
@@ -100,10 +96,8 @@ export class AnalisarFluxo implements OnInit {
       equipamentoFaixa: item.Equipamento?.faixa || ''
     };
 
-    // Salva na memória fingindo que o utilizador digitou isso na outra tela
     sessionStorage.setItem('filtrosPesquisaFluxo', JSON.stringify(filtrosPesquisa));
 
-    // Redireciona para a tela de Pesquisar Fluxo (Ajuste o caminho se a sua rota for diferente de '/fluxo')
     this.router.navigate(['/fluxo']);
   }
 }

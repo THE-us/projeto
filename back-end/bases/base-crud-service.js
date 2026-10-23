@@ -6,8 +6,6 @@ class BaseCrudService{
     }
 
     async findAll(filter){
-        //console.log('CHEGOU AQUI PORQUE????');
-        //console.log('isso é o filter: ', filter);
         return this.model.findAll(filter);
     }
 

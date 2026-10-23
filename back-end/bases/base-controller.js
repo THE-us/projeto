@@ -9,28 +9,16 @@ module.exports = () => {
     const router = express.Router();
 
     const findAll = async(req, res, Service, params) => {
-        //console.log('este é req: ', req);
-
         const { filter } = req;
-        const service = new Service(params);
-        
-        //console.log('este é o service: ', service);
-        //console.log('este é o filter: ', filter);
-        
+        const service = new Service(params);        
         const instances = await service.findAll(filter);
-
-        //console.log('essas são as instancias: ', instances);
         
-        Response.ok(res, instances); //linha 24
+        Response.ok(res, instances);
     };
 
     const create = async(req, res, Service, params) => {
         try {
             const { filter } = req;
-
-            //console.log('isso é o filter: ', filter);
-            //console.log('*********************');
-
             const values = req.matchedBody || req.body;
             const service = new Service(params);
 

@@ -9,7 +9,6 @@ import { FluxoService } from '../../services/fluxo';
   styleUrl: './pesquisar-fluxo.scss'
 })
 export class PesquisarFluxo implements OnInit {
-  // Captura o formulário HTML para garantir a limpeza total de campos inválidos (como datas incompletas)
   @ViewChild('formPesquisa') formPesquisa!: NgForm;
 
   fluxos: any[] = [];
@@ -22,7 +21,6 @@ export class PesquisarFluxo implements OnInit {
   totalPaginas = 0;
   paginaDigitada = 1;
 
-  // Filtros atualizados (removido equipamentoId e adicionados Código e Faixa)
   filtros: any = {
     dataInicio: '', dataFim: '', horaInicio: '', horaFim: '', placa: '', equipamentoCodigo: '', equipamentoFaixa: ''
   };
@@ -34,7 +32,7 @@ export class PesquisarFluxo implements OnInit {
     if (filtrosSalvos) {
       this.filtros = JSON.parse(filtrosSalvos);
       if (this.temFiltroPreenchido()) {
-        this.pesquisar(1); // Restaura na página 1
+        this.pesquisar(1);
       }
     }
   }
@@ -88,7 +86,6 @@ export class PesquisarFluxo implements OnInit {
   }
 
   limparFiltros(): void {
-    // Força o reset nativo do HTML antes de limpar o modelo
     if (this.formPesquisa) {
       this.formPesquisa.resetForm();
     }

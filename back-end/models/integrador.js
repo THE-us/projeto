@@ -22,13 +22,6 @@ module.exports = (sequelize, DataTypes) => {
                     tableName: 'integradors',
                     freezeTableName: true,
                     timestamps: true,
-                    // scopes:{
-                    //     excludeToken:{
-                    //         attributes:{
-                    //             exclude: ['token'],
-                    //         },
-                    //     },
-                    // },
                 }
             );
         }

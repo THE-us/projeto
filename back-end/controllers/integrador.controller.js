@@ -11,7 +11,6 @@ router.get(
     '/',
     sqFilter(),
     wrapAsync(async (req, res) => {
-        //console.log('ENTROU AQUI');
         await findAll(req, res, IntegradorService);
     })
 );

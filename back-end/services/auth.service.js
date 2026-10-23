@@ -20,7 +20,6 @@ class AuthService {
           throw new UnauthorizedError();
         }
         const { Integrador } = db.getDatabase();
-        // CORREÇÃO: findById substituído por findByPk
         const integrador = await Integrador.findByPk(id);
         if (!integrador || !integrador.ativo) {
           throw new UnauthorizedError();
@@ -41,8 +40,6 @@ class AuthService {
 
   async login(credentials) {
     const { Usuario } = db.getDatabase();
-    
-    // CORREÇÃO PRINCIPAL: Usar o findOne e unscoped() para garantir que traz a senha
     const usuario = await Usuario.unscoped().findOne({ where: { login: credentials.login } });
     
     if (!usuario || !usuario.ativo) {
@@ -65,7 +62,6 @@ class AuthService {
         throw new UnauthorizedError();
       }
       const { Usuario } = db.getDatabase();
-      // CORREÇÃO: findById substituído por findByPk
       const usuario = await Usuario.findByPk(payloadRefreshToken.id);
       if (!usuario || !usuario.ativo) {
         throw new UnauthorizedError();
@@ -80,7 +76,6 @@ class AuthService {
 
   async changePassword(passwords, user) {
     const { Usuario } = db.getDatabase();
-    // CORREÇÃO: findById substituído por findByPk
     const usuario = await Usuario.findByPk(user.id);
     const matched = await usuario.checkSenha(passwords.senhaAntiga);
     if (!matched) {
@@ -93,7 +88,6 @@ class AuthService {
 
   async getUserDetails(userId) {
     const { Usuario } = db.getDatabase();
-    // CORREÇÃO: findById substituído por findByPk
     const usuario = await Usuario.findByPk(userId);
     const userDetails = {
       nome: usuario.nome,
@@ -115,8 +109,6 @@ class AuthService {
             return next(new UnauthorizedError());
           }
           const { Usuario } = db.getDatabase();
-          
-          // CORREÇÃO: findById substituído por findByPk com unscoped()
           const usuario = await Usuario.unscoped().findByPk(req.auth.id);
           
           if (!usuario || (usuario.ativo !== undefined && !usuario.ativo)) {

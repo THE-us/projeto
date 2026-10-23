@@ -11,7 +11,6 @@ export class FluxoService {
 
   constructor(private http: HttpClient) { }
 
-  // Agora recebe página e limite, e retorna 'any' em vez de 'any[]', pois o backend envia um objeto com dados e totais
   pesquisar(filtros: any, pagina: number = 1, limite: number = 30): Observable<any> {
     let params = new HttpParams()
       .set('pagina', pagina.toString())

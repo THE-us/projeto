@@ -53,7 +53,6 @@ router.delete('/:id', validateParamIdAsIntAndSanitize(), wrapAsync(async (req, r
 }));
 
 router.get('/', sqFilter(), wrapAsync(async (req, res) => {
-    // 1. Extraímos também a página e o limite da requisição
     const { codigo, faixa, ativo, integradorNome, pagina = 1, limite = 10 } = req.query;
     
     let whereCond = {};
@@ -78,14 +77,12 @@ router.get('/', sqFilter(), wrapAsync(async (req, res) => {
         });
     }
 
-    // 2. Cálculo da paginação
     const limit = parseInt(limite) || 10;
     const page = parseInt(pagina) || 1;
     const offset = (page - 1) * limit;
 
     const service = new EquipamentoService();
     
-    // 3. Usa findAndCountAll para trazer os dados e o total geral
     const equipamentos = await service.model.findAndCountAll({
         where: whereCond,
         include: includeCond,
@@ -94,7 +91,6 @@ router.get('/', sqFilter(), wrapAsync(async (req, res) => {
         order: [['createdAt', 'DESC']]
     });
 
-    // 4. Retorna a estrutura paginada (Igual ao Fluxo)
     Response.ok(res, {
         dados: equipamentos.rows,
         totalRegistros: equipamentos.count,

@@ -78,12 +78,10 @@
     </tbody>
   </table>
 
-  <!-- SE NÃO TIVER DADOS -->
   <div *ngIf="fluxos.length === 0 && !carregando" class="mensagem-vazia">
     Utilize os filtros acima para pesquisar os fluxos registados.
   </div>
 
-  <!-- A MÁGICA DA PAGINAÇÃO ENTRA AQUI -->
   <div class="paginacao-container" *ngIf="totalRegistros > 0 && !carregando">
     <div class="info-paginacao">
       Exibindo {{ fluxos.length }} de <b>{{ totalRegistros }}</b> fluxos encontrados.

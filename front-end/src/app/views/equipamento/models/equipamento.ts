@@ -3,7 +3,7 @@ export interface Equipamento {
   codigo: string;
   faixa: number;
   tipo: string;
-  ativo: number; // TINYINT no backend
+  ativo: number;
   local: string;
   marca: string;
   modelo: string;

@@ -12,7 +12,6 @@ export class EquipamentoService {
 
   constructor(private http: HttpClient) { }
 
-  // Retorna any porque agora recebe um objeto com a paginação e os dados
   pesquisar(filtros: any, pagina: number = 1, limite: number = 10): Observable<any> {
     let params = new HttpParams()
       .set('pagina', pagina.toString())

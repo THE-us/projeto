@@ -128,12 +128,10 @@ class DefaultDatabaseImplementation{
     return db;
   }
 
-  // eslint-disable-next-line no-unused-vars
   async _createDatabase(config) {
     throw new Error(`Must be implemented in the subclass!!!`);
   }
 
-  // eslint-disable-next-line no-unused-vars
   async _dropDatabase(config) {
     throw new Error(`Must be implemented in the subclass!!!`);
   }
