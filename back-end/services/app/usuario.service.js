@@ -48,7 +48,17 @@ class UsuarioService extends BaseCrudService{
         }
     }
     
-    async validateCreate(login, nome, senha) {
+    async validateCreate(values) {
+        const loginBuscado = typeof values === 'object' ? values.login : values;
+        const UsuarioModel = db.getDatabase().Usuario;
+        const usuarioExistente = await UsuarioModel.findOne({ 
+            where: { login: loginBuscado } 
+        });
+
+        if (usuarioExistente) {
+            throw new ValidationError('Este login já está em uso. Por favor, escolha outro.');
+        }
+
         return true;
     }
 
