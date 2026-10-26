@@ -8,13 +8,6 @@
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   margin-bottom: 20px;
 
-  .logo {
-    color: white;
-    font-size: 18px;
-    font-weight: bold;
-    letter-spacing: 1px;
-  }
-
   .links {
     display: flex;
     align-items: center;
@@ -52,4 +45,14 @@
       }
     }
   }
+}
+
+.logo-gct {
+  height: 40px;
+  width: auto;
+  cursor: pointer;
+}
+
+.logo-gct:hover {
+  transform: scale(1.05);
 }
