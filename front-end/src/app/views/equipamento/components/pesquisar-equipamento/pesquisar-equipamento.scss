@@ -50,10 +50,13 @@ button {
   transition: 0.2s;
 }
 
+// Estilos dos Botões
 .btn-azul { background-color: #5bc0de; color: white; &:hover { background-color: #31b0d5; } }
 .btn-cinza { background-color: #bdc3c7; color: white; &:hover { background-color: #95a5a6; } }
 .btn-editar { background-color: #f0ad4e; color: white; margin-right: 5px; &:hover { background-color: #ec971f; } }
 .btn-excluir { background-color: #d9534f; color: white; &:hover { background-color: #c9302c; } }
+.btn-verde { background-color: #27ae60; color: white; &:hover { background-color: #219150; } }
+.btn-vermelho { background-color: #c0392b; color: white; &:hover { background-color: #a53125; } }
 
 .tabela-dados {
   width: 100%;

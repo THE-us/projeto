@@ -19,6 +19,10 @@ export class PesquisarEquipamento implements OnInit {
   totalRegistros = 0;
   totalPaginas = 0;
 
+  // Variáveis da Exportação
+  modoExportacao: boolean = false;
+  idsSelecionados: Set<number> = new Set<number>();
+
   filtros = {
     codigo: '',
     faixa: '',
@@ -111,15 +115,62 @@ export class PesquisarEquipamento implements OnInit {
     }
   }
 
+  // --- MÉTODOS DE EXPORTAÇÃO ---
+
+  iniciarExportacao(): void {
+    this.modoExportacao = true;
+    // Adiciona os da página atual sem apagar os que já possam estar noutras páginas
+    this.equipamentos.forEach(e => this.idsSelecionados.add(e.id as number));
+  }
+
+  cancelarExportacao(): void {
+    this.modoExportacao = false;
+    this.idsSelecionados.clear();
+  }
+
+  // Verifica se TODOS os itens da PÁGINA ATUAL estão marcados
+  todasDestaPaginaSelecionadas(): boolean {
+    if (this.equipamentos.length === 0) return false;
+    return this.equipamentos.every(e => this.idsSelecionados.has(e.id as number));
+  }
+
+  toggleSelecaoTodos(event: any): void {
+    if (event.target.checked) {
+      // Adiciona todos desta página à lista existente
+      this.equipamentos.forEach(e => this.idsSelecionados.add(e.id as number));
+    } else {
+      // Remove todos desta página da lista existente
+      this.equipamentos.forEach(e => this.idsSelecionados.delete(e.id as number));
+    }
+  }
+
+  toggleSelecaoItem(id: number | undefined, event: any): void {
+    if (id === undefined) return;
+    if (event.target.checked) {
+      this.idsSelecionados.add(id);
+    } else {
+      this.idsSelecionados.delete(id);
+    }
+  }
+
   confirmarExportacao(formato: 'xlsx' | 'pdf'): void {
     if (this.idsSelecionados.size === 0) {
       alert('Selecione pelo menos um equipamento para exportar.');
       return;
     }
 
-    const idsParaExportar = Array.from(this.idsSelecionados);
+    const idsParaExportar = Array.from<number>(this.idsSelecionados);
 
-    this.equipamentoService.exportarDados(idsParaExportar, formato).subscribe({
+    // Preparar os filtros exatos que estão na tela para irem para o Excel
+    const filtrosAtuais: any = {};
+    if (this.filtros.codigo) filtrosAtuais.codigo = this.filtros.codigo;
+    if (this.filtros.faixa) filtrosAtuais.faixa = this.filtros.faixa;
+    if (this.filtros.integradorNome) filtrosAtuais.integradorNome = this.filtros.integradorNome;
+    const ativoVal = String(this.filtros.ativo);
+    if (ativoVal === '1' || ativoVal === '0') filtrosAtuais.ativo = Number(ativoVal);
+
+    // Passamos os filtros como 3º parâmetro
+    this.equipamentoService.exportarDados(idsParaExportar, formato, filtrosAtuais).subscribe({
       next: (blob) => {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -127,7 +178,6 @@ export class PesquisarEquipamento implements OnInit {
         a.download = `exportacao-equipamentos.${formato}`;
         a.click();
         window.URL.revokeObjectURL(url);
-
         this.modoExportacao = false;
       },
       error: (err) => {

@@ -41,9 +41,38 @@
     </form>
   </div>
 
+  <!-- BARRA DE AÇÕES DE EXPORTAÇÃO -->
+  <div *ngIf="equipamentos.length > 0" style="display: flex; justify-content: flex-end; gap: 10px; margin-bottom: 15px;">
+    <!-- Botão Inicial -->
+    <button *ngIf="!modoExportacao" type="button" class="btn-cinza" (click)="iniciarExportacao()">
+      📥 Exportar Tabela
+    </button>
+
+    <!-- Botões de Confirmação (Só aparecem no modo exportação) -->
+    <ng-container *ngIf="modoExportacao">
+      <span style="align-self: center; margin-right: auto; font-weight: bold; color: #e74c3c;">
+        Selecione as linhas que deseja exportar:
+      </span>
+      <button type="button" class="btn-cinza" (click)="cancelarExportacao()">Cancelar</button>
+      <button type="button" class="btn-verde" (click)="confirmarExportacao('xlsx')">
+        📄 Baixar XLSX
+      </button>
+      <button type="button" class="btn-vermelho" (click)="confirmarExportacao('pdf')">
+        📕 Baixar PDF
+      </button>
+    </ng-container>
+  </div>
+
   <table border="1" cellpadding="12" cellspacing="0" class="tabela-dados" *ngIf="equipamentos.length > 0">
     <thead>
       <tr>
+        <!-- CHECKBOX CABEÇALHO -->
+        <th *ngIf="modoExportacao" style="width: 40px; text-align: center;">
+          <input type="checkbox"
+                 [checked]="idsSelecionados.size === equipamentos.length && equipamentos.length > 0"
+                 (change)="toggleSelecaoTodos($event)">
+        </th>
+
         <th>Código</th>
         <th>Marca / Modelo</th>
         <th>Tipo</th>
@@ -55,6 +84,12 @@
     </thead>
     <tbody>
       <tr *ngFor="let eq of equipamentos">
+        <td *ngIf="modoExportacao" style="text-align: center;">
+          <input type="checkbox"
+                 [checked]="idsSelecionados.has(eq.id!)"
+                 (change)="toggleSelecaoItem(eq.id!, $event)">
+        </td>
+
         <td>{{ eq.codigo }}</td>
         <td>{{ eq.marca }} / {{ eq.modelo }}</td>
         <td>{{ eq.tipo }}</td>
@@ -65,7 +100,7 @@
         </td>
         <td style="text-align: center;">
           <button type="button" class="btn-editar" [routerLink]="['/equipamento/editar', eq.id]">Editar</button>
-          <button type="button" class="btn-excluir" (click)="excluir(eq.id)">Excluir</button>
+          <button type="button" class="btn-excluir" (click)="excluir(eq.id!)">Excluir</button>
         </td>
       </tr>
     </tbody>
@@ -102,3 +137,4 @@
       </button>
     </div>
   </div>
+</div>

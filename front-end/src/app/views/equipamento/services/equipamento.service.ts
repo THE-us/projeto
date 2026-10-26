@@ -47,7 +47,7 @@ export class EquipamentoService {
 
   exportarDados(ids: number[], formato: 'xlsx' | 'pdf') {
     return this.http.post(
-      `${this.baseUrl}/exportacao/equipamentos`,
+      `${environment.apiUrl}/exportacao/equipamentos`,
       { ids, formato },
       { responseType: 'blob' }
     );
