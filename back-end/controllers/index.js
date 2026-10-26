@@ -11,5 +11,6 @@ router.use('/integrador', auth.jwtAuthorize(), require('./integrador.controller'
 router.use('/municipio', auth.jwtAuthorize(), require('./municipio.controller'));
 router.use('/equipamento', auth.jwtAuthorize(), require('./equipamento.controller'));
 router.use('/fluxo', auth.jwtAuthorize(), require('./fluxo.controller'));
+router.use('/exportacao',auth.jwtAuthorize() , require('./exportacao.controller'));
 
 module.exports = router;

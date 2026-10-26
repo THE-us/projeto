@@ -110,4 +110,30 @@ export class PesquisarEquipamento implements OnInit {
       });
     }
   }
+
+  confirmarExportacao(formato: 'xlsx' | 'pdf'): void {
+    if (this.idsSelecionados.size === 0) {
+      alert('Selecione pelo menos um equipamento para exportar.');
+      return;
+    }
+
+    const idsParaExportar = Array.from(this.idsSelecionados);
+
+    this.equipamentoService.exportarDados(idsParaExportar, formato).subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `exportacao-equipamentos.${formato}`;
+        a.click();
+        window.URL.revokeObjectURL(url);
+
+        this.modoExportacao = false;
+      },
+      error: (err) => {
+        console.error('Erro na exportação', err);
+        alert('Ocorreu um erro ao exportar os dados.');
+      }
+    });
+  }
 }

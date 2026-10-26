@@ -44,4 +44,12 @@ export class EquipamentoService {
   atualizar(id: number, equipamento: any): Observable<Equipamento>{
     return this.http.post<Equipamento>(`${this.baseUrl}/${id}`, equipamento);
   }
+
+  exportarDados(ids: number[], formato: 'xlsx' | 'pdf') {
+    return this.http.post(
+      `${this.baseUrl}/exportacao/equipamentos`,
+      { ids, formato },
+      { responseType: 'blob' }
+    );
+  }
 }
