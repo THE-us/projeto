@@ -21,6 +21,10 @@ export class PesquisarFluxo implements OnInit {
   totalPaginas = 0;
   paginaDigitada = 1;
 
+  // Variáveis de Exportação
+  modoExportacao: boolean = false;
+  idsSelecionados: Set<number> = new Set<number>();
+
   filtros: any = {
     dataInicio: '', dataFim: '', horaInicio: '', horaFim: '', placa: '', equipamentoCodigo: '', equipamentoFaixa: ''
   };
@@ -97,5 +101,80 @@ export class PesquisarFluxo implements OnInit {
     this.paginaAtual = 1;
     sessionStorage.removeItem('filtrosPesquisaFluxo');
     this.cdr.detectChanges();
+  }
+
+  // --- CONTROLO DA SELEÇÃO E EXPORTAÇÃO ---
+
+  iniciarExportacao(): void {
+    this.modoExportacao = true;
+    this.fluxos.forEach(f => {
+      if (f.id) this.idsSelecionados.add(f.id);
+    });
+  }
+
+  cancelarExportacao(): void {
+    this.modoExportacao = false;
+    this.idsSelecionados.clear();
+  }
+
+  todasDestaPaginaSelecionadas(): boolean {
+    if (this.fluxos.length === 0) return false;
+    return this.fluxos.every(f => f.id && this.idsSelecionados.has(f.id));
+  }
+
+  toggleSelecaoTodos(event: any): void {
+    if (event.target.checked) {
+      this.fluxos.forEach(f => {
+        if (f.id) this.idsSelecionados.add(f.id);
+      });
+    } else {
+      this.fluxos.forEach(f => {
+        if (f.id) this.idsSelecionados.delete(f.id);
+      });
+    }
+  }
+
+  toggleSelecaoItem(id: number | undefined, event: any): void {
+    if (!id) return;
+    if (event.target.checked) {
+      this.idsSelecionados.add(id);
+    } else {
+      this.idsSelecionados.delete(id);
+    }
+  }
+
+  confirmarExportacao(formato: 'xlsx' | 'pdf'): void {
+    if (this.idsSelecionados.size === 0) {
+      alert('Selecione pelo menos um fluxo para exportar.');
+      return;
+    }
+
+    const idsParaExportar = Array.from<number>(this.idsSelecionados);
+
+    // Mapeia os filtros atuais
+    const fAtuais: any = {};
+    if (this.filtros.dataInicio) fAtuais['Data Início'] = this.filtros.dataInicio;
+    if (this.filtros.dataFim) fAtuais['Data Fim'] = this.filtros.dataFim;
+    if (this.filtros.horaInicio) fAtuais['Hora Início'] = this.filtros.horaInicio;
+    if (this.filtros.horaFim) fAtuais['Hora Fim'] = this.filtros.horaFim;
+    if (this.filtros.placa) fAtuais.Placa = this.filtros.placa;
+    if (this.filtros.equipamentoCodigo) fAtuais['Cód. Equipamento'] = this.filtros.equipamentoCodigo;
+    if (this.filtros.equipamentoFaixa) fAtuais.Faixa = this.filtros.equipamentoFaixa;
+
+    this.fluxoService.exportarDados(idsParaExportar, formato, fAtuais).subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `exportacao-fluxos.${formato}`;
+        a.click();
+        window.URL.revokeObjectURL(url);
+        this.modoExportacao = false;
+      },
+      error: (err) => {
+        console.error('Erro na exportação:', err);
+        alert('Ocorreu um erro ao exportar os dados.');
+      }
+    });
   }
 }

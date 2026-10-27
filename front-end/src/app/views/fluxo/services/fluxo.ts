@@ -32,4 +32,12 @@ export class FluxoService {
 
     return this.http.get<any[]>(`${this.baseUrl}/analisar`, { params });
   }
+
+  exportarDados(ids: number[], formato: 'xlsx' | 'pdf', filtros: any) {
+    return this.http.post(
+      `${environment.apiUrl}/exportacao/fluxos`,
+      { ids, formato, filtros },
+      { responseType: 'blob' }
+    );
+  }
 }

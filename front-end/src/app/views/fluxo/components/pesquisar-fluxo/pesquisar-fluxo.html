@@ -8,32 +8,26 @@
           <label>Data Início</label>
           <input type="date" name="dataInicio" [(ngModel)]="filtros.dataInicio">
         </div>
-
         <div class="form-group">
           <label>Data Fim</label>
           <input type="date" name="dataFim" [(ngModel)]="filtros.dataFim">
         </div>
-
         <div class="form-group">
           <label>Hora Início</label>
           <input type="time" name="horaInicio" [(ngModel)]="filtros.horaInicio" step="1">
         </div>
-
         <div class="form-group">
           <label>Hora Fim</label>
           <input type="time" name="horaFim" [(ngModel)]="filtros.horaFim" step="1">
         </div>
-
         <div class="form-group">
           <label>Placa</label>
           <input type="text" name="placa" [(ngModel)]="filtros.placa" placeholder="ABC1234" maxlength="7">
         </div>
-
         <div class="form-group">
           <label>Código do Equipamento</label>
           <input type="text" name="equipamentoCodigo" [(ngModel)]="filtros.equipamentoCodigo" placeholder="Ex: 0000000">
         </div>
-
         <div class="form-group">
           <label>Faixa</label>
           <input type="number" name="equipamentoFaixa" [(ngModel)]="filtros.equipamentoFaixa" placeholder="Ex: 1">
@@ -51,9 +45,35 @@
     A pesquisar fluxos... Aguarde.
   </div>
 
+  <!-- BARRA DE AÇÕES DE EXPORTAÇÃO -->
+  <div *ngIf="fluxos.length > 0 && !carregando" style="display: flex; justify-content: flex-end; gap: 10px; margin-bottom: 15px;">
+    <button *ngIf="!modoExportacao" type="button" class="btn-cinza" (click)="iniciarExportacao()">
+      📥 Exportar Tabela
+    </button>
+    <ng-container *ngIf="modoExportacao">
+      <span style="align-self: center; margin-right: auto; font-weight: bold; color: #e74c3c;">
+        Selecione as linhas que deseja exportar:
+      </span>
+      <button type="button" class="btn-cinza" (click)="cancelarExportacao()">Cancelar</button>
+      <button type="button" style="background-color: #27ae60; color: white;" (click)="confirmarExportacao('xlsx')">
+        📄 Baixar XLSX
+      </button>
+      <button type="button" style="background-color: #c0392b; color: white;" (click)="confirmarExportacao('pdf')">
+        📕 Baixar PDF
+      </button>
+    </ng-container>
+  </div>
+
   <table class="tabela-dados" *ngIf="fluxos.length > 0 && !carregando">
     <thead>
       <tr>
+        <!-- CHECKBOX CABEÇALHO -->
+        <th *ngIf="modoExportacao" style="width: 40px; text-align: center;">
+          <input type="checkbox"
+                 [checked]="todasDestaPaginaSelecionadas()"
+                 (change)="toggleSelecaoTodos($event)">
+        </th>
+
         <th>ID</th>
         <th>Data</th>
         <th>Hora</th>
@@ -66,6 +86,13 @@
     </thead>
     <tbody>
       <tr *ngFor="let f of fluxos">
+        <!-- CHECKBOX LINHA -->
+        <td *ngIf="modoExportacao" style="text-align: center;">
+          <input type="checkbox"
+                 [checked]="idsSelecionados.has(f.id!)"
+                 (change)="toggleSelecaoItem(f.id!, $event)">
+        </td>
+
         <td>{{ f.id }}</td>
         <td>{{ f.data | date:'dd/MM/yyyy' }}</td>
         <td>{{ f.hora }}</td>
