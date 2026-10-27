@@ -50,7 +50,6 @@ button {
   transition: 0.2s;
 }
 
-// Estilos dos Botões
 .btn-azul { background-color: #5bc0de; color: white; &:hover { background-color: #31b0d5; } }
 .btn-cinza { background-color: #bdc3c7; color: white; &:hover { background-color: #95a5a6; } }
 .btn-editar { background-color: #f0ad4e; color: white; margin-right: 5px; &:hover { background-color: #ec971f; } }

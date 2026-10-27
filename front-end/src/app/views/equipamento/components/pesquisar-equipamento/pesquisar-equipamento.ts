@@ -115,12 +115,11 @@ export class PesquisarEquipamento implements OnInit {
     }
   }
 
-  // --- MÉTODOS DE EXPORTAÇÃO ---
-
   iniciarExportacao(): void {
     this.modoExportacao = true;
-    // Adiciona os da página atual sem apagar os que já possam estar noutras páginas
-    this.equipamentos.forEach(e => this.idsSelecionados.add(e.id as number));
+    this.equipamentos.forEach(e => {
+      if (e.id) this.idsSelecionados.add(e.id);
+    });
   }
 
   cancelarExportacao(): void {
@@ -128,24 +127,25 @@ export class PesquisarEquipamento implements OnInit {
     this.idsSelecionados.clear();
   }
 
-  // Verifica se TODOS os itens da PÁGINA ATUAL estão marcados
   todasDestaPaginaSelecionadas(): boolean {
     if (this.equipamentos.length === 0) return false;
-    return this.equipamentos.every(e => this.idsSelecionados.has(e.id as number));
+    return this.equipamentos.every(e => e.id && this.idsSelecionados.has(e.id));
   }
 
   toggleSelecaoTodos(event: any): void {
     if (event.target.checked) {
-      // Adiciona todos desta página à lista existente
-      this.equipamentos.forEach(e => this.idsSelecionados.add(e.id as number));
+      this.equipamentos.forEach(e => {
+        if (e.id) this.idsSelecionados.add(e.id);
+      });
     } else {
-      // Remove todos desta página da lista existente
-      this.equipamentos.forEach(e => this.idsSelecionados.delete(e.id as number));
+      this.equipamentos.forEach(e => {
+        if (e.id) this.idsSelecionados.delete(e.id);
+      });
     }
   }
 
   toggleSelecaoItem(id: number | undefined, event: any): void {
-    if (id === undefined) return;
+    if (!id) return;
     if (event.target.checked) {
       this.idsSelecionados.add(id);
     } else {
@@ -161,7 +161,6 @@ export class PesquisarEquipamento implements OnInit {
 
     const idsParaExportar = Array.from<number>(this.idsSelecionados);
 
-    // Preparar os filtros exatos que estão na tela para irem para o Excel
     const filtrosAtuais: any = {};
     if (this.filtros.codigo) filtrosAtuais.codigo = this.filtros.codigo;
     if (this.filtros.faixa) filtrosAtuais.faixa = this.filtros.faixa;
@@ -169,7 +168,6 @@ export class PesquisarEquipamento implements OnInit {
     const ativoVal = String(this.filtros.ativo);
     if (ativoVal === '1' || ativoVal === '0') filtrosAtuais.ativo = Number(ativoVal);
 
-    // Passamos os filtros como 3º parâmetro
     this.equipamentoService.exportarDados(idsParaExportar, formato, filtrosAtuais).subscribe({
       next: (blob) => {
         const url = window.URL.createObjectURL(blob);
@@ -181,7 +179,7 @@ export class PesquisarEquipamento implements OnInit {
         this.modoExportacao = false;
       },
       error: (err) => {
-        console.error('Erro na exportação', err);
+        console.error('Erro na exportação:', err);
         alert('Ocorreu um erro ao exportar os dados.');
       }
     });
