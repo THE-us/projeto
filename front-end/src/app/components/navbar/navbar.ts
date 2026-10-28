@@ -10,6 +10,7 @@ import { LoginService } from '../../views/login/services/login.service';
 })
 export class NavbarComponent implements OnInit {
   exibirNavbar = false;
+  menuAberto = false; // Controle do Menu Hambúrguer
 
   constructor(
     public router: Router,
@@ -22,7 +23,16 @@ export class NavbarComponent implements OnInit {
     });
   }
 
+  toggleMenu(): void {
+    this.menuAberto = !this.menuAberto;
+  }
+
+  fecharMenu(): void {
+    this.menuAberto = false;
+  }
+
   sair(): void {
+    this.fecharMenu();
     localStorage.removeItem('token');
     this.loginService.notificarLogin(false);
     this.router.navigate(['/login']);

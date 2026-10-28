@@ -59,6 +59,20 @@ module.exports = (sequelize, DataTypes) => {
           tableName: 'fluxo',
           freezeTableName: true,
           timestamps: true,
+          indexes: [
+            {
+              name: 'idx_fluxo_data_hora',
+              fields: ['data', 'hora']
+            },
+            {
+              name: 'idx_fluxo_placa',
+              fields: ['placa']
+            },
+            {
+              name: 'idx_fluxo_equipamento_data',
+              fields: ['equipamentoId', 'data']
+            }
+          ]
         }
       );
     }

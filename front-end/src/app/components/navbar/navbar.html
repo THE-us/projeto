@@ -1,12 +1,28 @@
 <nav class="navbar" *ngIf="exibirNavbar">
   <div class="navbar-brand">
-    <img src="front-end\public\logo" alt="Logo GCT" class="logo-gct">
+    <img src="/logo.png" alt="Logo GCT" class="logo-gct" routerLink="/equipamento">
   </div>
-  <div class="links">
-    <a routerLink="/equipamento" routerLinkActive="ativo">Equipamentos</a>
-    <a routerLink="/fluxo/pesquisar" routerLinkActive="ativo">Pesquisar Fluxos</a>
-    <a routerLink="/fluxo/analisar" routerLinkActive="ativo">Análise</a>
+
+  <!-- Botão Hambúrguer -->
+  <button class="hamburger-btn" (click)="toggleMenu()">
+    ☰
+  </button>
+
+  <!-- Menu Lateral Deslizante -->
+  <div class="links-lateral" [class.aberto]="menuAberto">
+    <button class="fechar-btn" (click)="fecharMenu()">✕</button>
+
+    <a routerLink="/equipamento" routerLinkActive="ativo" (click)="fecharMenu()">Equipamentos</a>
+    <a routerLink="/fluxo/pesquisar" routerLinkActive="ativo" (click)="fecharMenu()">Pesquisar Fluxos</a>
+    <a routerLink="/fluxo/analisar" routerLinkActive="ativo" (click)="fecharMenu()">Análise</a>
+
+    <hr>
+    <!-- Já deixei o link pronto para a nova tela que vamos criar a seguir -->
+    <a routerLink="/usuario/novo" routerLinkActive="ativo" (click)="fecharMenu()">+ Novo Usuário</a>
 
     <button class="btn-sair" (click)="sair()">Sair</button>
   </div>
+
+  <!-- Fundo escuro (Overlay) quando o menu está aberto -->
+  <div class="overlay" *ngIf="menuAberto" (click)="fecharMenu()"></div>
 </nav>
