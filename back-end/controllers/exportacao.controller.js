@@ -46,18 +46,29 @@ router.post(
     '/fluxos',
     wrapAsync(async (req, res) => {
         const { ids, formato, filtros } = req.body;
+    
+        const FluxoService = require('../services/app/fluxo.service');
+        const EquipamentoService = require('../services/app/equipamento.service');
+        const fluxoService = new FluxoService();
+        const equipamentoService = new EquipamentoService();
         
-        const database = require('../../db/database');
-        const db = database.getDatabase();
-        
-        // 1. Busca os fluxos marcados e os Equipamentos relacionados (para ter o código)
-        const fluxos = await db.Fluxo.findAll({
+        const fluxos = await fluxoService.model.findAll({
             where: { id: { [Op.in]: ids } },
-            include: [{ model: db.Equipamento, as: 'Equipamento' }],
             order: [['data', 'DESC'], ['hora', 'DESC']]
         });
 
-        // 2. Colunas da Tabela Excel/PDF
+        const idsEquipamentos = [...new Set(fluxos.map(f => f.equipamentoId).filter(id => id))];
+        let equipamentosMap = {};
+        
+        if (idsEquipamentos.length > 0) {
+            const equipamentos = await equipamentoService.model.findAll({
+                where: { id: { [Op.in]: idsEquipamentos } }
+            });
+            equipamentos.forEach(eq => {
+                equipamentosMap[eq.id] = { codigo: eq.codigo, faixa: eq.faixa };
+            });
+        }
+
         const colunas = [
             { header: 'ID', key: 'id', width: 10 },
             { header: 'Data', key: 'data', width: 15 },
@@ -69,9 +80,7 @@ router.post(
             { header: 'Faixa', key: 'faixa', width: 10 }
         ];
 
-        // 3. Mapear os dados para ficar formatado igual ao HTML
         const dadosMapeados = fluxos.map(f => {
-            // Formatar a data (ex: 2026-10-27 -> 27/10/2026)
             let dataFormatada = f.data;
             if (f.data && typeof f.data !== 'string') {
                 const dia = String(f.data.getDate()).padStart(2, '0');
@@ -82,6 +91,8 @@ router.post(
                 dataFormatada = `${parts[2]}/${parts[1]}/${parts[0]}`;
             }
 
+            const equip = equipamentosMap[f.equipamentoId];
+
             return {
                 id: f.id,
                 data: dataFormatada,
@@ -89,12 +100,11 @@ router.post(
                 placa: f.placa,
                 velMed: `${f.velMed} km/h`,
                 classVeic: f.classVeic,
-                codigoEquipamento: f.Equipamento ? f.Equipamento.codigo : f.equipamentoId,
-                faixa: f.Equipamento ? f.Equipamento.faixa : '-'
+                codigoEquipamento: equip ? equip.codigo : (f.equipamentoId || '-'),
+                faixa: equip ? equip.faixa : '-'
             };
         });
 
-        // 4. Manda pro Motor do ExcelJS (já adaptado para ler qualquer filtro)!
         const exportacaoService = new ExportacaoService();
         if (formato === 'xlsx') {
             await exportacaoService.gerarExcel('Fluxos', colunas, dadosMapeados, filtros, res);
