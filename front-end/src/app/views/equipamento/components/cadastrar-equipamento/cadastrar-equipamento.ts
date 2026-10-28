@@ -106,17 +106,25 @@ export class CadastrarEquipamento implements OnInit, OnDestroy {
     const payload = { ...this.equipamento };
     payload.marca = this.buscaIntegrador;
 
-    const anoMinimo = 2000;
-    const anoMaximo = 2030;
-
-    const validarData = (dataStr: string, nomeCampo: string): string | null => {
+    // Regra de negócio dinâmica: Ano mínimo 2000, Data máxima = Hoje
+    const validarData = (dataStr: string, nomeCampo: string): string | null | 'INTERROMPER_SALVAMENTO' => {
       if (!dataStr) return null;
-      const ano = new Date(dataStr).getFullYear();
-      if (ano < anoMinimo || ano > anoMaximo) {
-        const aceitaNulo = confirm(`A data de ${nomeCampo} (Ano: ${ano}) está fora do limite permitido (${anoMinimo}-${anoMaximo}). Deseja salvá-la em branco (null)? Se clicar em Cancelar, você poderá corrigir a data.`);
-        if (aceitaNulo) return null;
+
+      const dataInserida = new Date(dataStr + 'T12:00:00'); // Evita bugs de fuso horário
+      const dataMinima = new Date('2000-01-01T00:00:00');
+      const hoje = new Date();
+      hoje.setHours(23, 59, 59, 999); // Hoje até ao último milissegundo
+
+      if (dataInserida < dataMinima) {
+        alert(`A data de ${nomeCampo} não pode ser anterior ao ano 2000.`);
         return 'INTERROMPER_SALVAMENTO';
       }
+
+      if (dataInserida > hoje) {
+        alert(`A data de ${nomeCampo} não pode ser uma data futura.`);
+        return 'INTERROMPER_SALVAMENTO';
+      }
+
       return dataStr;
     };
 
