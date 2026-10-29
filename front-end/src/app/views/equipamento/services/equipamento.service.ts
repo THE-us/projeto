@@ -45,7 +45,6 @@ export class EquipamentoService {
     return this.http.post<Equipamento>(`${this.baseUrl}/${id}`, equipamento);
   }
 
-  // --- ATUALIZADO: Agora recebe os filtros e envia no body ---
   exportarDados(ids: number[], formato: 'xlsx' | 'pdf', filtros: any) {
     return this.http.post(
       `${environment.apiUrl}/exportacao/equipamentos`,

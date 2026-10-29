@@ -1,14 +1,14 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { FormsModule } from '@angular/forms'; // <-- IMPORTANTE: Resolve o erro do [(ngModel)] no HTML
+import { FormsModule } from '@angular/forms';
 import { UsuarioService } from '../service/usuario.service';
 
 @Component({
   selector: 'app-cadastrar-usuario',
-  standalone: true, // Configurado como standalone
-  imports: [FormsModule], // Módulo necessário para formulários
+  standalone: true,
+  imports: [FormsModule],
   templateUrl: './cadastrar-usuario.html',
-  styleUrl: './cadastrar-usuario.scss' // Aponta para o novo ficheiro de estilos
+  styleUrl: './cadastrar-usuario.scss'
 })
 export class CadastrarUsuarioComponent {
   usuario = { nome: '', login: '', senha: '', ativo: 1 };

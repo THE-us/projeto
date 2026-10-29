@@ -41,7 +41,6 @@
     </form>
   </div>
 
-  <!-- BARRA DE AÇÕES DE EXPORTAÇÃO -->
   <div *ngIf="equipamentos.length > 0" style="display: flex; justify-content: flex-end; gap: 10px; margin-bottom: 15px;">
     <button *ngIf="!modoExportacao" type="button" class="btn-cinza" (click)="iniciarExportacao()">
       📥 Exportar Tabela
@@ -64,7 +63,6 @@
   <table border="1" cellpadding="12" cellspacing="0" class="tabela-dados" *ngIf="equipamentos.length > 0">
     <thead>
       <tr>
-        <!-- CHECKBOX CABEÇALHO -->
         <th *ngIf="modoExportacao" style="width: 40px; text-align: center;">
           <input type="checkbox"
                  [checked]="todasDestaPaginaSelecionadas()"
@@ -82,7 +80,6 @@
     </thead>
     <tbody>
       <tr *ngFor="let eq of equipamentos">
-        <!-- CHECKBOX LINHA -->
         <td *ngIf="modoExportacao" style="text-align: center;">
           <input type="checkbox"
                  [checked]="idsSelecionados.has(eq.id!)"

@@ -14,7 +14,6 @@
 .card-formulario {
   max-width: 600px;
   margin: 0 auto;
-  /* Herda as propriedades globais do .filtros-card que você já tem no app.scss */
 
   form {
     display: flex;
@@ -55,7 +54,6 @@
   margin-top: 15px;
 }
 
-/* Os botões herdam do seu estilo global, mas adicionamos o estado de :disabled para quando está a carregar */
 button:disabled {
   opacity: 0.6;
   cursor: not-allowed;

@@ -10,7 +10,7 @@ import { LoginService } from '../../views/login/services/login.service';
 })
 export class NavbarComponent implements OnInit {
   exibirNavbar = false;
-  menuAberto = false; // Controle do Menu Hambúrguer
+  menuAberto = false;
 
   constructor(
     public router: Router,

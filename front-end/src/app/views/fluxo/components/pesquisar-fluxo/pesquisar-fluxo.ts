@@ -103,8 +103,6 @@ export class PesquisarFluxo implements OnInit {
     this.cdr.detectChanges();
   }
 
-  // --- CONTROLO DA SELEÇÃO E EXPORTAÇÃO ---
-
   iniciarExportacao(): void {
     this.modoExportacao = true;
     this.fluxos.forEach(f => {
@@ -150,8 +148,6 @@ export class PesquisarFluxo implements OnInit {
     }
 
     const idsParaExportar = Array.from<number>(this.idsSelecionados);
-
-    // Mapeia os filtros atuais
     const fAtuais: any = {};
     if (this.filtros.dataInicio) fAtuais['Data Início'] = this.filtros.dataInicio;
     if (this.filtros.dataFim) fAtuais['Data Fim'] = this.filtros.dataFim;

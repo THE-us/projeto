@@ -127,14 +127,13 @@ export class EditarEquipamento implements OnInit {
     const payload = { ...this.equipamento };
     payload.marca = this.buscaIntegrador;
 
-    // Regra de negócio dinâmica: Ano mínimo 2000, Data máxima = Hoje
     const validarData = (dataStr: string, nomeCampo: string): string | null | 'INTERROMPER_SALVAMENTO' => {
       if (!dataStr) return null;
 
-      const dataInserida = new Date(dataStr + 'T12:00:00'); // Evita bugs de fuso horário
+      const dataInserida = new Date(dataStr + 'T12:00:00');
       const dataMinima = new Date('2000-01-01T00:00:00');
       const hoje = new Date();
-      hoje.setHours(23, 59, 59, 999); // Hoje até ao último milissegundo
+      hoje.setHours(23, 59, 59, 999);
 
       if (dataInserida < dataMinima) {
         alert(`A data de ${nomeCampo} não pode ser anterior ao ano 2000.`);

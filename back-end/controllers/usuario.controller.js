@@ -66,18 +66,12 @@ router.get(
 
 router.post(
     '/',
-    // Passamos o array auth.authenticated() para garantir que apenas um usuário logado pode cadastrar outro (a menos que a sua regra de negócio permita qualquer um).
-    // Se no seu projeto base for aberto para criar o 1º admin, remova o auth.authenticated()
-    //uth.authenticated(),
     validateSchema(getSchema(schema)),
     matchedBody(),
     wrapAsync(async (req, res) => {
         console.log('REQUISICAO SIGN-UP');
-        // Validamos se o login já existe usando o serviço
         const service = new UsuarioService();
         await service.validateCreate(req.matchedBody.login);
-        
-        // Passamos os dados limpos e validados diretamente para a função genérica create
         await create(req, res, UsuarioService);
     })
 );
