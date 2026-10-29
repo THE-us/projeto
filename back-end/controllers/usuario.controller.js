@@ -68,7 +68,7 @@ router.post(
     '/',
     // Passamos o array auth.authenticated() para garantir que apenas um usuário logado pode cadastrar outro (a menos que a sua regra de negócio permita qualquer um).
     // Se no seu projeto base for aberto para criar o 1º admin, remova o auth.authenticated()
-    auth.authenticated(),
+    //uth.authenticated(),
     validateSchema(getSchema(schema)),
     matchedBody(),
     wrapAsync(async (req, res) => {

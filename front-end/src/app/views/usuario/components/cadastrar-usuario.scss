@@ -1,0 +1,62 @@
+.container-usuario {
+  padding: 20px;
+  background-color: #e5e7e9;
+  min-height: 100vh;
+
+  h2 {
+    color: #2c3e50;
+    font-weight: 400;
+    margin-top: 0;
+    margin-bottom: 20px;
+  }
+}
+
+.card-formulario {
+  max-width: 600px;
+  margin: 0 auto;
+  /* Herda as propriedades globais do .filtros-card que você já tem no app.scss */
+
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+
+  label {
+    font-size: 13px;
+    color: #7f8c8d;
+    margin-bottom: 5px;
+    font-weight: bold;
+  }
+
+  input, select {
+    padding: 10px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+
+    &:focus {
+      border-color: #5bc0de;
+    }
+  }
+}
+
+.acoes-form {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+/* Os botões herdam do seu estilo global, mas adicionamos o estado de :disabled para quando está a carregar */
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

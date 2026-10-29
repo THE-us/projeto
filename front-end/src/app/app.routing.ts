@@ -30,6 +30,11 @@ export const routes: Routes = [
   {
     path: '**',
     redirectTo: 'equipamento'
+  },
+  {
+    path: 'usuario',
+    loadChildren: () => import('./views/usuario/usuario-module').then(m => m.UsuarioModule),
+    canActivate: [AuthGuard]
   }
 ];
 
