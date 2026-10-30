@@ -63,6 +63,7 @@
     padding: 15px 0;
     border-bottom: 1px solid #34495e;
     transition: 0.2s;
+    cursor: pointer;
 
     &:hover { color: #ffffff; padding-left: 5px; }
     &.ativo { color: #5bc0de; border-bottom: 1px solid #5bc0de; }
@@ -70,17 +71,18 @@
 
   hr { border-color: #34495e; margin: 10px 0; }
 
-  .btn-sair {
-    margin-top: auto;
-    background-color: transparent;
-    border: 1px solid #e74c3c;
-    color: #e74c3c;
-    padding: 10px;
-    border-radius: 4px;
-    cursor: pointer;
+  .link-sair {
+    color: #e74c3c !important;
     font-weight: bold;
-    transition: 0.2s;
-    &:hover { background-color: #e74c3c; color: white; }
+    border-bottom: none !important;
+    margin-top: 5px;
+
+    &:hover {
+      background-color: #e74c3c;
+      color: #ffffff !important;
+      padding-left: 10px;
+      border-radius: 4px;
+    }
   }
 }
 

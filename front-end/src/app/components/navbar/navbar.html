@@ -13,11 +13,10 @@
     <a routerLink="/equipamento" routerLinkActive="ativo" (click)="fecharMenu()">Equipamentos</a>
     <a routerLink="/fluxo/pesquisar" routerLinkActive="ativo" (click)="fecharMenu()">Pesquisar Fluxos</a>
     <a routerLink="/fluxo/analisar" routerLinkActive="ativo" (click)="fecharMenu()">Análise</a>
-
-    <hr>
     <a routerLink="/usuario/novo" routerLinkActive="ativo" (click)="fecharMenu()">+ Novo Usuário</a>
 
-    <button class="btn-sair" (click)="sair()">Sair</button>
+    <hr>
+    <a class="link-sair" (click)="sair()">Sair da Conta</a>
   </div>
 
   <div class="overlay" *ngIf="menuAberto" (click)="fecharMenu()"></div>
