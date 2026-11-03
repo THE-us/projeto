@@ -1,7 +1,7 @@
 <div class="container">
   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
     <h2 style="margin: 0;">Pesquisar Equipamento</h2>
-    <button class="btn-azul" routerLink="/equipamento/novo">+ Novo Equipamento</button>
+    <button class="btn-azul" routerLink="/equipamento/novo">Novo Equipamento</button>
   </div>
 
   <div class="filtros-card">
@@ -43,7 +43,7 @@
 
   <div *ngIf="equipamentos.length > 0" class="barra-exportacao">
     <button *ngIf="!modoExportacao" type="button" class="btn-cinza" (click)="iniciarExportacao()">
-      📥 Exportar Tabela
+      Exportar Tabela
     </button>
 
     <ng-container *ngIf="modoExportacao">
@@ -51,17 +51,17 @@
         Selecione as linhas que deseja exportar ({{ quantidadeSelecionada() }} de {{ totalRegistros }} selecionadas):
       </span>
       <button *ngIf="!todasPaginasSelecionadas" type="button" class="btn-azul" (click)="selecionarTodasPaginas()">
-        ☑ Selecionar todas as páginas
+        Selecionar todas as páginas
       </button>
       <button *ngIf="todasPaginasSelecionadas" type="button" class="btn-azul" (click)="desmarcarTodasPaginas()">
-        ☐ Desmarcar todas as páginas
+        Desmarcar todas as páginas
       </button>
       <button type="button" class="btn-cinza" (click)="cancelarExportacao()">Cancelar</button>
       <button type="button" class="btn-verde" (click)="confirmarExportacao('xlsx')">
-        📄 Baixar XLSX
+        Baixar XLSX
       </button>
       <button type="button" class="btn-vermelho" (click)="confirmarExportacao('pdf')">
-        📕 Baixar PDF
+        Baixar PDF
       </button>
     </ng-container>
   </div>
