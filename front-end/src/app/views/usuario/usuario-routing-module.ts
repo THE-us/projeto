@@ -1,11 +1,14 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { CadastrarUsuarioComponent } from './components/cadastrar-usuario'
+import { CadastrarUsuario } from './components/cadastrar-usuario/cadastrar-usuario';
 
-const routes: Routes = [{ path: '', component: CadastrarUsuarioComponent }];
+const routes: Routes = [
+  { path: 'novo', component: CadastrarUsuario },
+  { path: '', redirectTo: 'novo', pathMatch: 'full' }
+];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule],
+  exports: [RouterModule]
 })
-export class UsuarioRoutingModule {}
+export class UsuarioRoutingModule { }

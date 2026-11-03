@@ -24,4 +24,22 @@ router.get(
     })
 );
 
+router.get(
+    '/veiculo-mais-incidentes',
+    wrapAsync(async (req, res) => {
+        const service = new FluxoService();
+        const dados = await service.veiculoMaisIncidentes(req.query);
+        Response.ok(res, dados);
+    })
+);
+
+router.get(
+    '/equipamento-mais-analisou',
+    wrapAsync(async (req, res) => {
+        const service = new FluxoService();
+        const dados = await service.equipamentoMaisAnalisouVeiculo(req.query);
+        Response.ok(res, dados);
+    })
+);
+
 module.exports = router;

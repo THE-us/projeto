@@ -1,7 +1,7 @@
 'use strict';
 const BaseCrudService = require('../../bases/base-crud-service');
 const database = require('../../db/database');
-const Error = require('../../errors/app-error-handler')
+const BadRequestError = require('../../errors/bad-request-error');
 const { Op } = require('sequelize');
 
 class FluxoService extends BaseCrudService{
@@ -10,7 +10,7 @@ class FluxoService extends BaseCrudService{
         super(db.Fluxo);
     }
 
-    async pesquisar(filtros) {
+    montarFiltroPesquisa(filtros = {}) {
         const db = database.getDatabase();
         const where = {};
         const includeEquipamentoWhere = {};
@@ -38,9 +38,25 @@ class FluxoService extends BaseCrudService{
             temFiltroEquipamento = true;
         }
 
-        const temFiltroFluxo = Object.keys(where).length > 0;
-        if (!temFiltroFluxo && !temFiltroEquipamento) {
-            throw new Error('É necessário informar pelo menos um filtro para a pesquisa.');
+        const include = [
+            {
+                model: db.Equipamento,
+                attributes: ['id', 'codigo', 'faixa'],
+                where: Object.keys(includeEquipamentoWhere).length > 0 ? includeEquipamentoWhere : undefined,
+                required: temFiltroEquipamento
+            }
+        ];
+
+        const temFiltro = Object.keys(where).length > 0 || temFiltroEquipamento;
+
+        return { where, include, temFiltro };
+    }
+
+    async pesquisar(filtros) {
+        const { where, include, temFiltro } = this.montarFiltroPesquisa(filtros);
+
+        if (!temFiltro) {
+            throw new BadRequestError('É necessário informar pelo menos um filtro para a pesquisa.');
         }
 
         const pagina = parseInt(filtros.pagina) || 1;
@@ -52,14 +68,7 @@ class FluxoService extends BaseCrudService{
             limit: limite,
             offset: salto,
             order: [['data', 'DESC'], ['hora', 'DESC']],
-            include: [
-                {
-                    model: db.Equipamento,
-                    attributes: ['id', 'codigo', 'faixa'],
-                    where: Object.keys(includeEquipamentoWhere).length > 0 ? includeEquipamentoWhere : undefined,
-                    required: temFiltroEquipamento
-                }
-            ]
+            include: include
         });
 
         return {
@@ -90,7 +99,7 @@ class FluxoService extends BaseCrudService{
             include: [
                 {
                     model: db.Equipamento,
-                    attributes: ['id', 'codigo', 'faixa'] 
+                    attributes: ['id', 'codigo', 'faixa']
                 }
             ],
             group: ['Fluxo.equipamentoId', 'Equipamento.id', 'Equipamento.codigo', 'Equipamento.faixa'],
@@ -98,6 +107,29 @@ class FluxoService extends BaseCrudService{
         });
 
         return resultados;
+    }
+
+    async veiculoMaisIncidentes(filtros) {
+        const db = database.getDatabase();
+        const limite = parseInt(filtros.limite) || 1;
+
+        return db.sequelize.query('CALL SP_VEICULO_MAIS_INCIDENTES(:limite)', {
+            replacements: { limite }
+        });
+    }
+
+    async equipamentoMaisAnalisouVeiculo(filtros) {
+        if (!filtros.placa || filtros.placa.trim() === '') {
+            throw new BadRequestError('É necessário informar a placa do veículo.');
+        }
+
+        const db = database.getDatabase();
+        const placa = filtros.placa.trim().toUpperCase();
+        const limite = parseInt(filtros.limite) || 1;
+
+        return db.sequelize.query('CALL SP_EQUIPAMENTO_MAIS_ANALISOU_VEICULO(:placa, :limite)', {
+            replacements: { placa, limite }
+        });
     }
 }
 

@@ -23,6 +23,11 @@ export const routes: Routes = [
     loadChildren: () => import('./views/municipio/municipio-module').then(m => m.MunicipioModule)
   },
   {
+    path: 'usuario',
+    canActivate: [AuthGuard],
+    loadChildren: () => import('./views/usuario/usuario-module').then(m => m.UsuarioModule)
+  },
+  {
     path: '',
     redirectTo: 'equipamento',
     pathMatch: 'full'
@@ -30,11 +35,6 @@ export const routes: Routes = [
   {
     path: '**',
     redirectTo: 'equipamento'
-  },
-  {
-    path: 'usuario',
-    loadChildren: () => import('./views/usuario/usuario-module').then(m => m.UsuarioModule),
-    canActivate: [AuthGuard]
   }
 ];
 

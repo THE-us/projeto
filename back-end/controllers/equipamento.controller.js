@@ -13,8 +13,6 @@ const EquipamentoService = require('../services/app/equipamento.service');
 const { validateSchema, matchedBody, validateParamIdAsIntAndSanitize } = require('../util/validations');
 const { findById } = require('../bases/base-model');
 const { Response } = require('../bases/base-controller')();
-const { Op } = require('sequelize');
-const db = require('../db/database');
 
 const schema = {
     codigo:{ in: ['body'], isLength:{ options: {min: 1, max: 11}, }, },
@@ -53,39 +51,18 @@ router.delete('/:id', validateParamIdAsIntAndSanitize(), wrapAsync(async (req, r
 }));
 
 router.get('/', sqFilter(), wrapAsync(async (req, res) => {
-    const { codigo, faixa, ativo, integradorNome, pagina = 1, limite = 10 } = req.query;
-    
-    let whereCond = {};
-
-    if (codigo) whereCond.codigo = { [Op.like]: `%${codigo}%` };
-    if (faixa) whereCond.faixa = faixa;
-    if (ativo !== undefined && ativo !== '') whereCond.ativo = ativo;
-
-    let includeCond = [];
-    const { Integrador } = db.getDatabase();
-
-    if (integradorNome) {
-        includeCond.push({
-            model: Integrador,
-            where: { nome: { [Op.like]: `%${integradorNome}%` } },
-            required: true
-        });
-    } else if (Integrador) {
-        includeCond.push({
-            model: Integrador,
-            required: false
-        });
-    }
+    const { pagina = 1, limite = 10 } = req.query;
 
     const limit = parseInt(limite) || 10;
     const page = parseInt(pagina) || 1;
     const offset = (page - 1) * limit;
 
     const service = new EquipamentoService();
-    
+    const { where, include } = service.montarFiltroPesquisa(req.query);
+
     const equipamentos = await service.model.findAndCountAll({
-        where: whereCond,
-        include: includeCond,
+        where: where,
+        include: include,
         limit: limit,
         offset: offset,
         order: [['createdAt', 'DESC']]

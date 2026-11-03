@@ -45,10 +45,10 @@ export class EquipamentoService {
     return this.http.post<Equipamento>(`${this.baseUrl}/${id}`, equipamento);
   }
 
-  exportarDados(ids: number[], formato: 'xlsx' | 'pdf', filtros: any) {
+  exportarDados(ids: number[], formato: 'xlsx' | 'pdf', filtros: any, selecaoTotal: any = {}) {
     return this.http.post(
       `${environment.apiUrl}/exportacao/equipamentos`,
-      { ids, formato, filtros },
+      { ids, formato, filtros, ...selecaoTotal },
       { responseType: 'blob' }
     );
   }

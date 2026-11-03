@@ -45,19 +45,25 @@
     A pesquisar fluxos... Aguarde.
   </div>
 
-  <div *ngIf="fluxos.length > 0 && !carregando" style="display: flex; justify-content: flex-end; gap: 10px; margin-bottom: 15px;">
+  <div *ngIf="fluxos.length > 0 && !carregando" class="barra-exportacao">
     <button *ngIf="!modoExportacao" type="button" class="btn-cinza" (click)="iniciarExportacao()">
       📥 Exportar Tabela
     </button>
     <ng-container *ngIf="modoExportacao">
-      <span style="align-self: center; margin-right: auto; font-weight: bold; color: #e74c3c;">
-        Selecione as linhas que deseja exportar:
+      <span class="aviso-selecao">
+        Selecione as linhas que deseja exportar ({{ quantidadeSelecionada() }} de {{ totalRegistros }} selecionadas):
       </span>
+      <button *ngIf="!todasPaginasSelecionadas" type="button" class="btn-azul" (click)="selecionarTodasPaginas()">
+        ☑ Selecionar todas as páginas
+      </button>
+      <button *ngIf="todasPaginasSelecionadas" type="button" class="btn-azul" (click)="desmarcarTodasPaginas()">
+        ☐ Desmarcar todas as páginas
+      </button>
       <button type="button" class="btn-cinza" (click)="cancelarExportacao()">Cancelar</button>
-      <button type="button" style="background-color: #27ae60; color: white;" (click)="confirmarExportacao('xlsx')">
+      <button type="button" class="btn-verde" (click)="confirmarExportacao('xlsx')">
         📄 Baixar XLSX
       </button>
-      <button type="button" style="background-color: #c0392b; color: white;" (click)="confirmarExportacao('pdf')">
+      <button type="button" class="btn-vermelho" (click)="confirmarExportacao('pdf')">
         📕 Baixar PDF
       </button>
     </ng-container>
@@ -86,7 +92,7 @@
       <tr *ngFor="let f of fluxos">
         <td *ngIf="modoExportacao" style="text-align: center;">
           <input type="checkbox"
-                 [checked]="idsSelecionados.has(f.id!)"
+                 [checked]="estaSelecionado(f.id)"
                  (change)="toggleSelecaoItem(f.id!, $event)">
         </td>
 

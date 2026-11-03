@@ -77,3 +77,11 @@ GET /fluxo/pesquisar?dataInicio=2025-03-01&dataFim=2025-03-31 - com token
 GET /fluxo/analisar - com token
 
 GET /fluxo/analisar?dataInicio=2025-03-01&dataFim=2025-03-31 - com token
+
+GET /fluxo/veiculo-mais-incidentes - com token
+
+GET /fluxo/veiculo-mais-incidentes?limite=10 - com token
+
+GET /fluxo/equipamento-mais-analisou?placa=SGU3I66 - com token
+
+GET /fluxo/equipamento-mais-analisou?placa=SGU3I66&limite=5 - com token

@@ -12,16 +12,18 @@ export class PesquisarEquipamento implements OnInit {
   equipamentos: Equipamento[] = [];
   carregando = false;
 
-  // Variáveis da Paginação
   paginaAtual = 1;
   paginaDigitada = 1;
   limitePorPagina = 10;
   totalRegistros = 0;
   totalPaginas = 0;
 
-  // Variáveis da Exportação
   modoExportacao: boolean = false;
   idsSelecionados: Set<number> = new Set<number>();
+  todasPaginasSelecionadas = false;
+  idsDesmarcados: Set<number> = new Set<number>();
+  private filtrosAplicados: any = {};
+  private filtrosSelecaoTotal: any = {};
 
   filtros = {
     codigo: '',
@@ -61,6 +63,11 @@ export class PesquisarEquipamento implements OnInit {
     if (ativoVal === '1' || ativoVal === '0') {
       filtrosLimpos.ativo = Number(ativoVal);
     }
+
+    if (this.todasPaginasSelecionadas && JSON.stringify(filtrosLimpos) !== JSON.stringify(this.filtrosSelecaoTotal)) {
+      this.desmarcarTodasPaginas();
+    }
+    this.filtrosAplicados = filtrosLimpos;
 
     this.equipamentoService.pesquisar(filtrosLimpos, this.paginaAtual, this.limitePorPagina).subscribe({
       next: (resposta) => {
@@ -124,42 +131,77 @@ export class PesquisarEquipamento implements OnInit {
 
   cancelarExportacao(): void {
     this.modoExportacao = false;
+    this.desmarcarTodasPaginas();
+  }
+
+  selecionarTodasPaginas(): void {
+    this.todasPaginasSelecionadas = true;
+    this.filtrosSelecaoTotal = { ...this.filtrosAplicados };
+    this.idsDesmarcados.clear();
     this.idsSelecionados.clear();
   }
 
-  todasDestaPaginaSelecionadas(): boolean {
-    if (this.equipamentos.length === 0) return false;
-    return this.equipamentos.every(e => e.id && this.idsSelecionados.has(e.id));
+  desmarcarTodasPaginas(): void {
+    this.todasPaginasSelecionadas = false;
+    this.idsDesmarcados.clear();
+    this.idsSelecionados.clear();
   }
 
-  toggleSelecaoTodos(event: any): void {
-    if (event.target.checked) {
-      this.equipamentos.forEach(e => {
-        if (e.id) this.idsSelecionados.add(e.id);
-      });
-    } else {
-      this.equipamentos.forEach(e => {
-        if (e.id) this.idsSelecionados.delete(e.id);
-      });
+  estaSelecionado(id: number | undefined): boolean {
+    if (!id) return false;
+    if (this.todasPaginasSelecionadas) {
+      return !this.idsDesmarcados.has(id);
     }
+    return this.idsSelecionados.has(id);
   }
 
-  toggleSelecaoItem(id: number | undefined, event: any): void {
-    if (!id) return;
-    if (event.target.checked) {
+  quantidadeSelecionada(): number {
+    if (this.todasPaginasSelecionadas) {
+      return this.totalRegistros - this.idsDesmarcados.size;
+    }
+    return this.idsSelecionados.size;
+  }
+
+  private marcarItem(id: number, marcado: boolean): void {
+    if (this.todasPaginasSelecionadas) {
+      if (marcado) {
+        this.idsDesmarcados.delete(id);
+      } else {
+        this.idsDesmarcados.add(id);
+      }
+    } else if (marcado) {
       this.idsSelecionados.add(id);
     } else {
       this.idsSelecionados.delete(id);
     }
   }
 
+  todasDestaPaginaSelecionadas(): boolean {
+    if (this.equipamentos.length === 0) return false;
+    return this.equipamentos.every(e => this.estaSelecionado(e.id));
+  }
+
+  toggleSelecaoTodos(event: any): void {
+    this.equipamentos.forEach(e => {
+      if (e.id) this.marcarItem(e.id, event.target.checked);
+    });
+  }
+
+  toggleSelecaoItem(id: number | undefined, event: any): void {
+    if (!id) return;
+    this.marcarItem(id, event.target.checked);
+  }
+
   confirmarExportacao(formato: 'xlsx' | 'pdf'): void {
-    if (this.idsSelecionados.size === 0) {
+    if (this.quantidadeSelecionada() === 0) {
       alert('Selecione pelo menos um equipamento para exportar.');
       return;
     }
 
-    const idsParaExportar = Array.from<number>(this.idsSelecionados);
+    const idsParaExportar = this.todasPaginasSelecionadas ? [] : Array.from<number>(this.idsSelecionados);
+    const selecaoTotal = this.todasPaginasSelecionadas
+      ? { todos: true, filtrosPesquisa: this.filtrosSelecaoTotal, idsExcluidos: Array.from<number>(this.idsDesmarcados) }
+      : {};
 
     const filtrosAtuais: any = {};
     if (this.filtros.codigo) filtrosAtuais.codigo = this.filtros.codigo;
@@ -168,7 +210,7 @@ export class PesquisarEquipamento implements OnInit {
     const ativoVal = String(this.filtros.ativo);
     if (ativoVal === '1' || ativoVal === '0') filtrosAtuais.ativo = Number(ativoVal);
 
-    this.equipamentoService.exportarDados(idsParaExportar, formato, filtrosAtuais).subscribe({
+    this.equipamentoService.exportarDados(idsParaExportar, formato, filtrosAtuais, selecaoTotal).subscribe({
       next: (blob) => {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -176,7 +218,7 @@ export class PesquisarEquipamento implements OnInit {
         a.download = `exportacao-equipamentos.${formato}`;
         a.click();
         window.URL.revokeObjectURL(url);
-        this.modoExportacao = false;
+        this.cancelarExportacao();
       },
       error: (err) => {
         console.error('Erro na exportação:', err);

@@ -1,6 +1,6 @@
-<div class="container" style="padding: 20px; background-color: #e5e7e9; min-height: 100vh;">
+<div class="container">
   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-    <h2 style="color: #2c3e50; font-weight: 400; margin: 0;">Pesquisar Equipamento</h2>
+    <h2 style="margin: 0;">Pesquisar Equipamento</h2>
     <button class="btn-azul" routerLink="/equipamento/novo">+ Novo Equipamento</button>
   </div>
 
@@ -41,15 +41,21 @@
     </form>
   </div>
 
-  <div *ngIf="equipamentos.length > 0" style="display: flex; justify-content: flex-end; gap: 10px; margin-bottom: 15px;">
+  <div *ngIf="equipamentos.length > 0" class="barra-exportacao">
     <button *ngIf="!modoExportacao" type="button" class="btn-cinza" (click)="iniciarExportacao()">
       📥 Exportar Tabela
     </button>
 
     <ng-container *ngIf="modoExportacao">
-      <span style="align-self: center; margin-right: auto; font-weight: bold; color: #e74c3c;">
-        Selecione as linhas que deseja exportar:
+      <span class="aviso-selecao">
+        Selecione as linhas que deseja exportar ({{ quantidadeSelecionada() }} de {{ totalRegistros }} selecionadas):
       </span>
+      <button *ngIf="!todasPaginasSelecionadas" type="button" class="btn-azul" (click)="selecionarTodasPaginas()">
+        ☑ Selecionar todas as páginas
+      </button>
+      <button *ngIf="todasPaginasSelecionadas" type="button" class="btn-azul" (click)="desmarcarTodasPaginas()">
+        ☐ Desmarcar todas as páginas
+      </button>
       <button type="button" class="btn-cinza" (click)="cancelarExportacao()">Cancelar</button>
       <button type="button" class="btn-verde" (click)="confirmarExportacao('xlsx')">
         📄 Baixar XLSX
@@ -82,7 +88,7 @@
       <tr *ngFor="let eq of equipamentos">
         <td *ngIf="modoExportacao" style="text-align: center;">
           <input type="checkbox"
-                 [checked]="idsSelecionados.has(eq.id!)"
+                 [checked]="estaSelecionado(eq.id)"
                  (change)="toggleSelecaoItem(eq.id, $event)">
         </td>
 

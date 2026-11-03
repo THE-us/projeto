@@ -1,16 +1,14 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { FormsModule } from '@angular/forms';
-import { UsuarioService } from '../service/usuario.service';
+import { UsuarioService } from '../../services/usuario.service';
 
 @Component({
   selector: 'app-cadastrar-usuario',
-  standalone: true,
-  imports: [FormsModule],
+  standalone: false,
   templateUrl: './cadastrar-usuario.html',
   styleUrl: './cadastrar-usuario.scss'
 })
-export class CadastrarUsuarioComponent {
+export class CadastrarUsuario {
   usuario = { nome: '', login: '', senha: '', ativo: 1 };
   carregando = false;
 

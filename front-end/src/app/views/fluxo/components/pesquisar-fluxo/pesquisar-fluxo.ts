@@ -14,16 +14,18 @@ export class PesquisarFluxo implements OnInit {
   fluxos: any[] = [];
   carregando = false;
 
-  // Variáveis de Paginação
   paginaAtual = 1;
   limitePorPagina = 30;
   totalRegistros = 0;
   totalPaginas = 0;
   paginaDigitada = 1;
 
-  // Variáveis de Exportação
   modoExportacao: boolean = false;
   idsSelecionados: Set<number> = new Set<number>();
+  todasPaginasSelecionadas = false;
+  idsDesmarcados: Set<number> = new Set<number>();
+  private filtrosAplicados: any = {};
+  private filtrosSelecaoTotal: any = {};
 
   filtros: any = {
     dataInicio: '', dataFim: '', horaInicio: '', horaFim: '', placa: '', equipamentoCodigo: '', equipamentoFaixa: ''
@@ -56,6 +58,18 @@ export class PesquisarFluxo implements OnInit {
     this.paginaAtual = paginaDesejada;
 
     sessionStorage.setItem('filtrosPesquisaFluxo', JSON.stringify(this.filtros));
+
+    const filtrosPreenchidos: any = {};
+    Object.keys(this.filtros).forEach(chave => {
+      if (this.filtros[chave] !== null && this.filtros[chave] !== '') {
+        filtrosPreenchidos[chave] = this.filtros[chave];
+      }
+    });
+
+    if (this.todasPaginasSelecionadas && JSON.stringify(filtrosPreenchidos) !== JSON.stringify(this.filtrosSelecaoTotal)) {
+      this.desmarcarTodasPaginas();
+    }
+    this.filtrosAplicados = filtrosPreenchidos;
 
     this.fluxoService.pesquisar(this.filtros, this.paginaAtual, this.limitePorPagina).subscribe({
       next: (resposta) => {
@@ -112,42 +126,77 @@ export class PesquisarFluxo implements OnInit {
 
   cancelarExportacao(): void {
     this.modoExportacao = false;
+    this.desmarcarTodasPaginas();
+  }
+
+  selecionarTodasPaginas(): void {
+    this.todasPaginasSelecionadas = true;
+    this.filtrosSelecaoTotal = { ...this.filtrosAplicados };
+    this.idsDesmarcados.clear();
     this.idsSelecionados.clear();
   }
 
-  todasDestaPaginaSelecionadas(): boolean {
-    if (this.fluxos.length === 0) return false;
-    return this.fluxos.every(f => f.id && this.idsSelecionados.has(f.id));
+  desmarcarTodasPaginas(): void {
+    this.todasPaginasSelecionadas = false;
+    this.idsDesmarcados.clear();
+    this.idsSelecionados.clear();
   }
 
-  toggleSelecaoTodos(event: any): void {
-    if (event.target.checked) {
-      this.fluxos.forEach(f => {
-        if (f.id) this.idsSelecionados.add(f.id);
-      });
-    } else {
-      this.fluxos.forEach(f => {
-        if (f.id) this.idsSelecionados.delete(f.id);
-      });
+  estaSelecionado(id: number | undefined): boolean {
+    if (!id) return false;
+    if (this.todasPaginasSelecionadas) {
+      return !this.idsDesmarcados.has(id);
     }
+    return this.idsSelecionados.has(id);
   }
 
-  toggleSelecaoItem(id: number | undefined, event: any): void {
-    if (!id) return;
-    if (event.target.checked) {
+  quantidadeSelecionada(): number {
+    if (this.todasPaginasSelecionadas) {
+      return this.totalRegistros - this.idsDesmarcados.size;
+    }
+    return this.idsSelecionados.size;
+  }
+
+  private marcarItem(id: number, marcado: boolean): void {
+    if (this.todasPaginasSelecionadas) {
+      if (marcado) {
+        this.idsDesmarcados.delete(id);
+      } else {
+        this.idsDesmarcados.add(id);
+      }
+    } else if (marcado) {
       this.idsSelecionados.add(id);
     } else {
       this.idsSelecionados.delete(id);
     }
   }
 
+  todasDestaPaginaSelecionadas(): boolean {
+    if (this.fluxos.length === 0) return false;
+    return this.fluxos.every(f => this.estaSelecionado(f.id));
+  }
+
+  toggleSelecaoTodos(event: any): void {
+    this.fluxos.forEach(f => {
+      if (f.id) this.marcarItem(f.id, event.target.checked);
+    });
+  }
+
+  toggleSelecaoItem(id: number | undefined, event: any): void {
+    if (!id) return;
+    this.marcarItem(id, event.target.checked);
+  }
+
   confirmarExportacao(formato: 'xlsx' | 'pdf'): void {
-    if (this.idsSelecionados.size === 0) {
+    if (this.quantidadeSelecionada() === 0) {
       alert('Selecione pelo menos um fluxo para exportar.');
       return;
     }
 
-    const idsParaExportar = Array.from<number>(this.idsSelecionados);
+    const idsParaExportar = this.todasPaginasSelecionadas ? [] : Array.from<number>(this.idsSelecionados);
+    const selecaoTotal = this.todasPaginasSelecionadas
+      ? { todos: true, filtrosPesquisa: this.filtrosSelecaoTotal, idsExcluidos: Array.from<number>(this.idsDesmarcados) }
+      : {};
     const fAtuais: any = {};
     if (this.filtros.dataInicio) fAtuais['Data Início'] = this.filtros.dataInicio;
     if (this.filtros.dataFim) fAtuais['Data Fim'] = this.filtros.dataFim;
@@ -157,7 +206,7 @@ export class PesquisarFluxo implements OnInit {
     if (this.filtros.equipamentoCodigo) fAtuais['Cód. Equipamento'] = this.filtros.equipamentoCodigo;
     if (this.filtros.equipamentoFaixa) fAtuais.Faixa = this.filtros.equipamentoFaixa;
 
-    this.fluxoService.exportarDados(idsParaExportar, formato, fAtuais).subscribe({
+    this.fluxoService.exportarDados(idsParaExportar, formato, fAtuais, selecaoTotal).subscribe({
       next: (blob) => {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -165,7 +214,7 @@ export class PesquisarFluxo implements OnInit {
         a.download = `exportacao-fluxos.${formato}`;
         a.click();
         window.URL.revokeObjectURL(url);
-        this.modoExportacao = false;
+        this.cancelarExportacao();
       },
       error: (err) => {
         console.error('Erro na exportação:', err);
