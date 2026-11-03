@@ -10,7 +10,7 @@ const DatabaseNotFoundError = require('../errors/database-not-found-error');
 const namespace = cls.createNamespace('my-very-own-namespace');
 Sequelize.useCLS(namespace);
 
-const pathDatabaseModels = '../../../../../../../../Users/matheus.soares/me/edoc/Treinamento/projeto/back-end/models';
+const pathDatabaseModels = path.resolve(__dirname, '../models');
 
 const operatorAliases = {
     $or: Op.or,
@@ -101,7 +101,6 @@ class DefaultDatabaseImplementation{
   }
 
   _initDatabase(config, basePath) {
-    const rootpath = this._getRootpath();
     const db = {};
     const sequelize = new Sequelize(config);
     sequelize.addHook('beforeCreate', (values) => {
@@ -113,7 +112,7 @@ class DefaultDatabaseImplementation{
         return file.endsWith('.js') && file !== 'index.js';
       })
       .forEach((file) => {
-        const model = require(path.join(rootpath, basePath, file))(sequelize, Sequelize.DataTypes);
+        const model = require(path.join(basePath, file))(sequelize, Sequelize.DataTypes);
         db[model.name] = model;
       });
 
