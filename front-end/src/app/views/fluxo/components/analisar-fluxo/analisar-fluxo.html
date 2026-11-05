@@ -37,7 +37,7 @@
       Processando os dados no servidor... Aguarde.
     </div>
 
-    <div class="cartoes-resumo" *ngIf="!carregando && dadosAnalise.length > 0">
+    <!-- <div class="cartoes-resumo" *ngIf="!carregando && dadosAnalise.length > 0">
       <div class="cartao-resumo">
         <div class="cartao-icone"><app-icone nome="grafico" [tamanho]="22"></app-icone></div>
         <div class="cartao-conteudo">
@@ -72,7 +72,7 @@
           </span>
         </div>
       </div>
-    </div>
+    </div> -->
 
     <table class="tabela-dados" *ngIf="dadosAnalise.length > 0 && !carregando">
       <thead>
@@ -116,7 +116,7 @@
     </div>
   </ng-container>
 
-  <div class="painel">
+  <!--<div class="painel">
     <div class="painel-cabecalho">
       <div class="cartao-icone"><app-icone nome="carro" [tamanho]="22"></app-icone></div>
       <div>
@@ -129,9 +129,9 @@
 
     <div *ngIf="!carregandoVeiculos && veiculosFrequentes.length === 0" class="mensagem-vazia">
       Nenhum veículo com placa registrada.
-    </div>
+    </div> -->
 
-    <table class="tabela-dados" *ngIf="!carregandoVeiculos && veiculosFrequentes.length > 0">
+    <!-- <table class="tabela-dados" *ngIf="!carregandoVeiculos && veiculosFrequentes.length > 0">
       <thead>
         <tr>
           <th style="text-align: center; width: 80px;">Posição</th>
@@ -178,5 +178,5 @@
         </ng-container>
       </tbody>
     </table>
-  </div>
+  </div> -->
 </div>
