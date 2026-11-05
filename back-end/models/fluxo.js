@@ -17,7 +17,7 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: x,
           },
           data:{
-            type: DataTypes.DATE,
+            type: DataTypes.DATEONLY,
             allowNull: x,
           },
           hora:{
@@ -65,12 +65,16 @@ module.exports = (sequelize, DataTypes) => {
               fields: ['data', 'hora']
             },
             {
+              name: 'idx_fluxo_hora',
+              fields: ['hora']
+            },
+            {
               name: 'idx_fluxo_placa',
               fields: ['placa']
             },
             {
-              name: 'idx_fluxo_equipamento_data',
-              fields: ['equipamentoId', 'data']
+              name: 'idx_fluxo_equipamento_data_hora',
+              fields: ['equipamentoId', 'data', 'hora']
             }
           ]
         }

@@ -6,12 +6,12 @@
     <form (ngSubmit)="fazerLogin()">
 
       <div class="input-group">
-        <span class="icon">👤</span>
+        <span class="icon"><app-icone nome="usuario" [tamanho]="18"></app-icone></span>
         <input type="text" name="login" [(ngModel)]="credenciais.login" placeholder="Login" required>
       </div>
 
       <div class="input-group">
-        <span class="icon">🔒</span>
+        <span class="icon"><app-icone nome="cadeado" [tamanho]="18"></app-icone></span>
         <input type="password" name="senha" [(ngModel)]="credenciais.senha" placeholder="Senha" required>
       </div>
 

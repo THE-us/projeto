@@ -2,26 +2,26 @@
   <h2>Novo Usuário</h2>
 
   <div class="form-card card-formulario">
-    <form (ngSubmit)="salvar()" #formUsuario="ngForm">
+    <form (ngSubmit)="salvar()" #formUsuario="ngForm" autocomplete="off">
 
       <div class="form-group">
         <label>Nome Completo *</label>
-        <input type="text" name="nome" [(ngModel)]="usuario.nome" placeholder="Digite o nome" required maxlength="100">
+        <input type="text" name="nomeNovoUsuario" [(ngModel)]="usuario.nome" placeholder="Digite o nome" required maxlength="100" autocomplete="off">
       </div>
 
       <div class="form-group">
         <label>Login de Acesso *</label>
-        <input type="text" name="login" [(ngModel)]="usuario.login" placeholder="Ex: admin" required minlength="3" maxlength="30">
+        <input type="text" name="loginNovoUsuario" [(ngModel)]="usuario.login" placeholder="Ex: admin" required minlength="3" maxlength="30" autocomplete="off">
       </div>
 
       <div class="form-group">
         <label>Senha *</label>
-        <input type="password" name="senha" [(ngModel)]="usuario.senha" placeholder="Mínimo 6 caracteres" required minlength="6" maxlength="15">
+        <input type="password" name="senhaNovoUsuario" [(ngModel)]="usuario.senha" placeholder="Mínimo 6 caracteres" required minlength="6" maxlength="15" autocomplete="new-password">
       </div>
 
       <div class="form-group">
         <label>Status</label>
-        <select name="ativo" [(ngModel)]="usuario.ativo">
+        <select name="ativoNovoUsuario" [(ngModel)]="usuario.ativo">
           <option [ngValue]="1">Ativo</option>
           <option [ngValue]="0">Inativo</option>
         </select>

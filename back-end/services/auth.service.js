@@ -91,6 +91,7 @@ class AuthService {
     const usuario = await Usuario.findByPk(userId);
     const userDetails = {
       nome: usuario.nome,
+      login: usuario.login,
       perfil: usuario.perfil,
     };
     return userDetails;

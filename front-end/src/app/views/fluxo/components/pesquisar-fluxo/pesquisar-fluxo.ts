@@ -13,6 +13,9 @@ export class PesquisarFluxo implements OnInit {
 
   fluxos: any[] = [];
   carregando = false;
+  pesquisaRealizada = false;
+
+  veiculosFrequentes: any[] = [];
 
   paginaAtual = 1;
   limitePorPagina = 30;
@@ -41,10 +44,51 @@ export class PesquisarFluxo implements OnInit {
         this.pesquisar(1);
       }
     }
+
+    this.carregarVeiculosFrequentes();
+  }
+
+  carregarVeiculosFrequentes(): void {
+    this.fluxoService.veiculosMaisFrequentes(8).subscribe({
+      next: (dados) => {
+        this.veiculosFrequentes = dados;
+        this.cdr.detectChanges();
+      },
+      error: (erro) => {
+        console.error('Erro ao carregar os veículos mais frequentes:', erro);
+      }
+    });
   }
 
   temFiltroPreenchido(): boolean {
     return Object.values(this.filtros).some(valor => valor !== null && valor !== '');
+  }
+
+  pesquisarPlaca(placa: string): void {
+    this.filtros = { dataInicio: '', dataFim: '', horaInicio: '', horaFim: '', placa: placa, equipamentoCodigo: '', equipamentoFaixa: '' };
+    this.pesquisar(1);
+  }
+
+  filtrosAtivos(): { rotulo: string; valor: string }[] {
+    const ativos: { rotulo: string; valor: string }[] = [];
+    const formatarData = (valor: string) => valor.split('-').reverse().join('/');
+
+    if (this.filtrosAplicados.dataInicio && this.filtrosAplicados.dataFim) {
+      ativos.push({ rotulo: 'Período', valor: `${formatarData(this.filtrosAplicados.dataInicio)} a ${formatarData(this.filtrosAplicados.dataFim)}` });
+    }
+    if (this.filtrosAplicados.horaInicio && this.filtrosAplicados.horaFim) {
+      ativos.push({ rotulo: 'Horário', valor: `${this.filtrosAplicados.horaInicio} a ${this.filtrosAplicados.horaFim}` });
+    }
+    if (this.filtrosAplicados.placa) ativos.push({ rotulo: 'Placa', valor: this.filtrosAplicados.placa });
+    if (this.filtrosAplicados.equipamentoCodigo) ativos.push({ rotulo: 'Equipamento', valor: this.filtrosAplicados.equipamentoCodigo });
+    if (this.filtrosAplicados.equipamentoFaixa) ativos.push({ rotulo: 'Faixa', valor: String(this.filtrosAplicados.equipamentoFaixa) });
+
+    return ativos;
+  }
+
+  acimaDoLimite(fluxo: any): boolean {
+    const limite = fluxo.Equipamento?.velocidadeLimite;
+    return !!limite && fluxo.velMed > limite;
   }
 
   pesquisar(paginaDesejada: number = 1): void {
@@ -76,6 +120,7 @@ export class PesquisarFluxo implements OnInit {
         this.fluxos = [...resposta.dados];
         this.totalRegistros = resposta.totalRegistros;
         this.totalPaginas = resposta.totalPaginas;
+        this.pesquisaRealizada = true;
 
         this.carregando = false;
         this.cdr.detectChanges();
@@ -83,6 +128,7 @@ export class PesquisarFluxo implements OnInit {
       error: (erro) => {
         console.error('Erro ao pesquisar fluxos:', erro);
         this.carregando = false;
+        this.cdr.detectChanges();
         alert('Erro ao realizar a pesquisa.');
       }
     });
@@ -113,6 +159,8 @@ export class PesquisarFluxo implements OnInit {
     this.totalRegistros = 0;
     this.totalPaginas = 0;
     this.paginaAtual = 1;
+    this.pesquisaRealizada = false;
+    this.filtrosAplicados = {};
     sessionStorage.removeItem('filtrosPesquisaFluxo');
     this.cdr.detectChanges();
   }

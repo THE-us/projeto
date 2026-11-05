@@ -1,5 +1,8 @@
 <div class="container">
   <h2>Análise de Fluxos por Equipamento</h2>
+  <p class="descricao-pagina">
+    Quantidade de passagens registradas por cada equipamento. Os totais são consolidados automaticamente a cada 10 minutos.
+  </p>
 
   <div class="filtros-card">
     <form (ngSubmit)="filtrar()">
@@ -25,14 +28,50 @@
     </form>
   </div>
 
+  <div *ngIf="!pesquisaRealizada" class="aviso-inicial">
+    Informe um intervalo de datas ou clique em <b>Mostrar Total Geral</b> para visualizar a análise.
+  </div>
+
   <ng-container *ngIf="pesquisaRealizada">
-    <div style="margin: 15px 0; padding: 10px; background-color: #d4e6f1; border-left: 4px solid #3498db; border-radius: 4px; color: #2980b9;">
-      <b *ngIf="vendoTotalGeral">Exibindo o total histórico de passagens de todos os tempos.</b>
-      <b *ngIf="!vendoTotalGeral">Exibindo a análise entre as datas {{ filtros.dataInicio | date:'dd/MM/yyyy' }} e {{ filtros.dataFim | date:'dd/MM/yyyy' }}.</b>
+    <div *ngIf="carregando" class="mensagem-carregando">
+      Processando os dados no servidor... Aguarde.
     </div>
 
-    <div *ngIf="carregando" style="text-align: center; padding: 40px; color: #3498db; font-weight: bold;">
-      <p>A processar dados no servidor... Aguarde.</p>
+    <div class="cartoes-resumo" *ngIf="!carregando && dadosAnalise.length > 0">
+      <div class="cartao-resumo">
+        <div class="cartao-icone"><app-icone nome="grafico" [tamanho]="22"></app-icone></div>
+        <div class="cartao-conteudo">
+          <span class="cartao-rotulo">Total de passagens</span>
+          <span class="cartao-valor">{{ totalPassagens() | number }}</span>
+        </div>
+      </div>
+
+      <div class="cartao-resumo">
+        <div class="cartao-icone"><app-icone nome="radar" [tamanho]="22"></app-icone></div>
+        <div class="cartao-conteudo">
+          <span class="cartao-rotulo">Equipamentos com registros</span>
+          <span class="cartao-valor">{{ dadosAnalise.length }}</span>
+        </div>
+      </div>
+
+      <div class="cartao-resumo">
+        <div class="cartao-icone"><app-icone nome="grafico" [tamanho]="22"></app-icone></div>
+        <div class="cartao-conteudo">
+          <span class="cartao-rotulo">Média por equipamento</span>
+          <span class="cartao-valor">{{ mediaPorEquipamento() | number }}</span>
+        </div>
+      </div>
+
+      <div class="cartao-resumo">
+        <div class="cartao-icone"><app-icone nome="calendario" [tamanho]="22"></app-icone></div>
+        <div class="cartao-conteudo">
+          <span class="cartao-rotulo">Período analisado</span>
+          <span class="cartao-valor cartao-valor-texto" *ngIf="vendoTotalGeral">Todo o histórico</span>
+          <span class="cartao-valor cartao-valor-texto" *ngIf="!vendoTotalGeral">
+            {{ filtros.dataInicio | date:'dd/MM/yyyy' }} a {{ filtros.dataFim | date:'dd/MM/yyyy' }}
+          </span>
+        </div>
+      </div>
     </div>
 
     <table class="tabela-dados" *ngIf="dadosAnalise.length > 0 && !carregando">
@@ -43,18 +82,27 @@
           <th>Código do Equipamento</th>
           <th>Faixa</th>
           <th>Quantidade de Fluxos</th>
+          <th style="width: 220px;">Participação</th>
           <th style="text-align: center;">Ações</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let item of dadosAnalise; let i = index">
-          <td style="text-align: center; font-size: 1.1em;"><b>#{{ i + 1 }}</b></td>
+          <td style="text-align: center; font-size: 1.1em;"><b>{{ i + 1 }}º</b></td>
           <td>{{ item.equipamentoId }}</td>
           <td><b>{{ item.Equipamento?.codigo || 'N/D' }}</b></td>
           <td>{{ item.Equipamento?.faixa || 'N/D' }}</td>
           <td class="destaque-total">{{ item.totalFluxos | number }} passagens</td>
+          <td>
+            <div class="participacao">
+              <div class="participacao-barra">
+                <div class="participacao-preenchimento" [style.width.%]="percentual(item)"></div>
+              </div>
+              <span>{{ percentual(item) | number:'1.1-1' }}%</span>
+            </div>
+          </td>
           <td style="text-align: center;">
-            <button type="button" class="btn-azul" style="padding: 6px 12px; font-size: 0.9em;" (click)="verPassagens(item)">
+            <button type="button" class="btn-azul btn-pequeno" (click)="verPassagens(item)">
               Ver Passagens
             </button>
           </td>
@@ -64,7 +112,71 @@
 
     <div *ngIf="dadosAnalise.length === 0 && !carregando" class="mensagem-vazia">
       <span *ngIf="!vendoTotalGeral">Nenhum fluxo encontrado para o intervalo de datas selecionado.</span>
-      <span *ngIf="vendoTotalGeral">O banco de dados ainda não possui registos consolidados.</span>
+      <span *ngIf="vendoTotalGeral">O banco de dados ainda não possui registros consolidados.</span>
     </div>
   </ng-container>
+
+  <div class="painel">
+    <div class="painel-cabecalho">
+      <div class="cartao-icone"><app-icone nome="carro" [tamanho]="22"></app-icone></div>
+      <div>
+        <h3>Veículos com mais passagens</h3>
+        <span class="painel-subtitulo">Considera todo o histórico de fluxos registrados.</span>
+      </div>
+    </div>
+
+    <div *ngIf="carregandoVeiculos" class="mensagem-carregando">Carregando os veículos...</div>
+
+    <div *ngIf="!carregandoVeiculos && veiculosFrequentes.length === 0" class="mensagem-vazia">
+      Nenhum veículo com placa registrada.
+    </div>
+
+    <table class="tabela-dados" *ngIf="!carregandoVeiculos && veiculosFrequentes.length > 0">
+      <thead>
+        <tr>
+          <th style="text-align: center; width: 80px;">Posição</th>
+          <th>Placa</th>
+          <th>Passagens</th>
+          <th>Equipamentos</th>
+          <th>Primeira Passagem</th>
+          <th>Última Passagem</th>
+          <th style="text-align: center;">Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <ng-container *ngFor="let veiculo of veiculosFrequentes; let i = index">
+          <tr>
+            <td style="text-align: center;"><b>{{ i + 1 }}º</b></td>
+            <td><b>{{ veiculo.placa }}</b></td>
+            <td class="destaque-total">{{ veiculo.totalPassagens | number }}</td>
+            <td>{{ veiculo.totalEquipamentos }}</td>
+            <td>{{ formatarDataHora(veiculo.primeiraPassagem) }}</td>
+            <td>{{ formatarDataHora(veiculo.ultimaPassagem) }}</td>
+            <td style="text-align: center; white-space: nowrap;">
+              <button type="button" class="btn-cinza btn-pequeno" (click)="alternarDetalheVeiculo(veiculo.placa)">
+                {{ placaExpandida === veiculo.placa ? 'Ocultar' : 'Equipamentos' }}
+              </button>
+              <button type="button" class="btn-azul btn-pequeno" (click)="verPassagensPlaca(veiculo.placa)">
+                Ver Passagens
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="placaExpandida === veiculo.placa" class="linha-detalhe">
+            <td colspan="7">
+              <span *ngIf="!equipamentosPorPlaca[veiculo.placa]">Carregando os equipamentos...</span>
+              <div class="detalhe-equipamentos" *ngIf="equipamentosPorPlaca[veiculo.placa]">
+                <span class="detalhe-titulo">Equipamentos que mais registraram a placa {{ veiculo.placa }}:</span>
+                <div class="detalhe-item" *ngFor="let equipamento of equipamentosPorPlaca[veiculo.placa]; let j = index">
+                  <b>{{ j + 1 }}º</b>
+                  <span>{{ equipamento.codigo }} / Faixa {{ equipamento.faixa }}</span>
+                  <span class="detalhe-local">{{ equipamento.local }}</span>
+                  <span class="destaque-total">{{ equipamento.totalPassagens | number }} passagens</span>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </ng-container>
+      </tbody>
+    </table>
+  </div>
 </div>

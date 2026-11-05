@@ -3,12 +3,32 @@
     <img src="/logo.png" alt="Logo GCT" class="logo-gct" routerLink="/equipamento">
   </div>
 
-  <button class="hamburger-btn" (click)="toggleMenu()">
-    ☰
-  </button>
+  <div class="navbar-direita">
+    <span class="usuario-topo" *ngIf="usuarioLogado">
+      <app-icone nome="usuario" [tamanho]="18"></app-icone>
+      {{ usuarioLogado.nome }}
+    </span>
+
+    <button class="hamburger-btn" type="button" aria-label="Abrir menu" (click)="toggleMenu()">
+      <app-icone nome="menu" [tamanho]="28"></app-icone>
+    </button>
+  </div>
 
   <div class="links-lateral" [class.aberto]="menuAberto">
-    <button class="fechar-btn" (click)="fecharMenu()">✕</button>
+    <button class="fechar-btn" type="button" aria-label="Fechar menu" (click)="fecharMenu()">
+      <app-icone nome="fechar" [tamanho]="20"></app-icone>
+    </button>
+
+    <div class="usuario-logado" *ngIf="usuarioLogado">
+      <div class="avatar">
+        <app-icone nome="usuario" [tamanho]="22"></app-icone>
+      </div>
+      <div class="usuario-dados">
+        <span class="usuario-rotulo">Conectado como</span>
+        <span class="usuario-nome">{{ usuarioLogado.nome }}</span>
+        <span class="usuario-login">{{ usuarioLogado.login }}</span>
+      </div>
+    </div>
 
     <a routerLink="/equipamento" routerLinkActive="ativo" (click)="fecharMenu()">Equipamentos</a>
     <a routerLink="/fluxo/pesquisar" routerLinkActive="ativo" (click)="fecharMenu()">Pesquisar Fluxos</a>
@@ -16,7 +36,10 @@
     <a routerLink="/usuario/novo" routerLinkActive="ativo" (click)="fecharMenu()">Novo Usuário</a>
 
     <hr>
-    <a class="link-sair" (click)="sair()">Sair da Conta</a>
+    <a class="link-sair" (click)="sair()">
+      <app-icone nome="sair" [tamanho]="18"></app-icone>
+      Sair da Conta
+    </a>
   </div>
 
   <div class="overlay" *ngIf="menuAberto" (click)="fecharMenu()"></div>

@@ -1,5 +1,8 @@
 <div class="container">
   <h2>Pesquisar Fluxos</h2>
+  <p class="descricao-pagina">
+    Consulte as passagens de veículos registradas pelos equipamentos. Informe pelo menos um filtro para pesquisar.
+  </p>
 
   <div class="filtros-card">
     <form (ngSubmit)="pesquisar(1)" #formPesquisa="ngForm">
@@ -41,8 +44,18 @@
     </form>
   </div>
 
-  <div *ngIf="carregando" style="text-align: center; padding: 30px; color: #3498db; font-weight: bold;">
-    A pesquisar fluxos... Aguarde.
+  <div *ngIf="carregando" class="mensagem-carregando">
+    Pesquisando os fluxos... Aguarde.
+  </div>
+
+  <div class="resumo-pesquisa" *ngIf="pesquisaRealizada && !carregando">
+    <span class="resumo-total">
+      <app-icone nome="busca" [tamanho]="18"></app-icone>
+      <b>{{ totalRegistros | number }}</b> {{ totalRegistros === 1 ? 'fluxo encontrado' : 'fluxos encontrados' }}
+    </span>
+    <span class="filtro-tag" *ngFor="let filtro of filtrosAtivos()">
+      <b>{{ filtro.rotulo }}:</b> {{ filtro.valor }}
+    </span>
   </div>
 
   <div *ngIf="fluxos.length > 0 && !carregando" class="barra-exportacao">
@@ -86,6 +99,7 @@
         <th>Classe</th>
         <th>Cód. Equip.</th>
         <th>Faixa</th>
+        <th>Local</th>
       </tr>
     </thead>
     <tbody>
@@ -100,17 +114,46 @@
         <td>{{ f.data | date:'dd/MM/yyyy' }}</td>
         <td>{{ f.hora }}</td>
         <td><b>{{ f.placa }}</b></td>
-        <td>{{ f.velMed }} km/h</td>
+        <td>
+          <span [class.velocidade-acima]="acimaDoLimite(f)">{{ f.velMed }} km/h</span>
+          <span class="selo-limite" *ngIf="acimaDoLimite(f)" [title]="'Limite do equipamento: ' + f.Equipamento.velocidadeLimite + ' km/h'">
+            Acima do limite
+          </span>
+        </td>
         <td>{{ f.classVeic }}</td>
         <td>{{ f.Equipamento?.codigo || f.equipamentoId }}</td>
         <td>{{ f.Equipamento?.faixa || '-' }}</td>
+        <td class="coluna-local">{{ f.Equipamento?.local || '-' }}</td>
       </tr>
     </tbody>
   </table>
 
-  <div *ngIf="fluxos.length === 0 && !carregando" class="mensagem-vazia">
-    Utilize os filtros acima para pesquisar os fluxos registados.
+  <div *ngIf="pesquisaRealizada && fluxos.length === 0 && !carregando" class="mensagem-vazia">
+    Nenhum fluxo encontrado com os filtros informados.
   </div>
+
+  <ng-container *ngIf="!pesquisaRealizada && !carregando">
+    <div class="aviso-inicial">
+      Utilize os filtros acima para pesquisar os fluxos registrados, ou escolha uma das placas mais frequentes abaixo.
+    </div>
+
+    <div class="painel" *ngIf="veiculosFrequentes.length > 0">
+      <div class="painel-cabecalho">
+        <div class="cartao-icone"><app-icone nome="carro" [tamanho]="22"></app-icone></div>
+        <div>
+          <h3>Placas mais frequentes</h3>
+          <span class="painel-subtitulo">Clique em uma placa para pesquisar todas as passagens do veículo.</span>
+        </div>
+      </div>
+
+      <div class="lista-placas">
+        <button type="button" class="placa-atalho" *ngFor="let veiculo of veiculosFrequentes" (click)="pesquisarPlaca(veiculo.placa)">
+          <span class="placa-numero">{{ veiculo.placa }}</span>
+          <span class="placa-total">{{ veiculo.totalPassagens | number }} passagens</span>
+        </button>
+      </div>
+    </div>
+  </ng-container>
 
   <div class="paginacao-container" *ngIf="totalRegistros > 0 && !carregando">
     <div class="info-paginacao">

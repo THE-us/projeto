@@ -5,12 +5,12 @@ const EquipamentoService = require('../services/app/equipamento.service');
 const BadRequestError = require('../errors/bad-request-error');
 const { Op } = require('sequelize');
 
-const montarConsultaExportacao = (service, { ids, todos, filtrosPesquisa, idsExcluidos }) => {
+const montarConsultaExportacao = async (service, { ids, todos, filtrosPesquisa, idsExcluidos }) => {
     if (!todos) {
         return { where: { id: { [Op.in]: ids || [] } }, include: [], temFiltro: true };
     }
 
-    const consulta = service.montarFiltroPesquisa(filtrosPesquisa || {});
+    const consulta = await service.montarFiltroPesquisa(filtrosPesquisa || {});
 
     if (Array.isArray(idsExcluidos) && idsExcluidos.length > 0) {
         consulta.where.id = { [Op.notIn]: idsExcluidos };
@@ -25,7 +25,7 @@ router.post(
         const { formato, filtros } = req.body;
 
         const eqService = new EquipamentoService();
-        const { where, include } = montarConsultaExportacao(eqService, req.body);
+        const { where, include } = await montarConsultaExportacao(eqService, req.body);
         const equipamentos = await eqService.model.findAll({
             where: where,
             include: include,
@@ -69,7 +69,7 @@ router.post(
         const fluxoService = new FluxoService();
         const equipamentoService = new EquipamentoService();
 
-        const { where, include, temFiltro } = montarConsultaExportacao(fluxoService, req.body);
+        const { where, include, temFiltro } = await montarConsultaExportacao(fluxoService, req.body);
 
         if (!temFiltro) {
             throw new BadRequestError('É necessário informar pelo menos um filtro para exportar todos os fluxos.');

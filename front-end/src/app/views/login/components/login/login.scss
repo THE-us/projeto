@@ -38,6 +38,9 @@
   background-color: #ffffff;
 
   .icon {
+    display: flex;
+    align-items: center;
+    align-self: stretch;
     padding: 10px 15px;
     color: #95a5a6;
     border-right: 1px solid #ced4da;

@@ -10,17 +10,13 @@ class FluxoService extends BaseCrudService{
         super(db.Fluxo);
     }
 
-    montarFiltroPesquisa(filtros = {}) {
+    async montarFiltroPesquisa(filtros = {}) {
         const db = database.getDatabase();
         const where = {};
-        const includeEquipamentoWhere = {};
-        let temFiltroEquipamento = false;
+        const whereEquipamento = {};
 
         if (filtros.dataInicio && filtros.dataFim) {
-            where.data = {
-                [Op.gte]: filtros.dataInicio + ' 00:00:00',
-                [Op.lte]: filtros.dataFim + ' 23:59:59'
-            };
+            where.data = { [Op.between]: [filtros.dataInicio, filtros.dataFim] };
         }
 
         if (filtros.horaInicio && filtros.horaFim) {
@@ -29,31 +25,33 @@ class FluxoService extends BaseCrudService{
 
         if (filtros.placa) where.placa = filtros.placa;
 
-        if (filtros.equipamentoCodigo) {
-            includeEquipamentoWhere.codigo = { [Op.like]: `%${filtros.equipamentoCodigo}%` };
-            temFiltroEquipamento = true;
-        }
-        if (filtros.equipamentoFaixa) {
-            includeEquipamentoWhere.faixa = filtros.equipamentoFaixa;
-            temFiltroEquipamento = true;
+        if (filtros.equipamentoCodigo) whereEquipamento.codigo = { [Op.like]: `%${filtros.equipamentoCodigo}%` };
+        if (filtros.equipamentoFaixa) whereEquipamento.faixa = filtros.equipamentoFaixa;
+
+        if (Object.keys(whereEquipamento).length > 0) {
+            const equipamentos = await db.Equipamento.findAll({
+                where: whereEquipamento,
+                attributes: ['id'],
+                raw: true
+            });
+            where.equipamentoId = { [Op.in]: equipamentos.map(e => e.id) };
         }
 
         const include = [
             {
                 model: db.Equipamento,
-                attributes: ['id', 'codigo', 'faixa'],
-                where: Object.keys(includeEquipamentoWhere).length > 0 ? includeEquipamentoWhere : undefined,
-                required: temFiltroEquipamento
+                attributes: ['id', 'codigo', 'faixa', 'local', 'velocidadeLimite'],
+                required: false
             }
         ];
 
-        const temFiltro = Object.keys(where).length > 0 || temFiltroEquipamento;
+        const temFiltro = Object.keys(where).length > 0;
 
         return { where, include, temFiltro };
     }
 
     async pesquisar(filtros) {
-        const { where, include, temFiltro } = this.montarFiltroPesquisa(filtros);
+        const { where, include, temFiltro } = await this.montarFiltroPesquisa(filtros);
 
         if (!temFiltro) {
             throw new BadRequestError('É necessário informar pelo menos um filtro para a pesquisa.');
@@ -84,17 +82,14 @@ class FluxoService extends BaseCrudService{
         const where = {};
 
         if (filtros.dataInicio && filtros.dataFim) {
-            where.data = {
-                [Op.gte]: filtros.dataInicio + ' 00:00:00',
-                [Op.lte]: filtros.dataFim + ' 23:59:59'
-            };
+            where.data = { [Op.between]: [filtros.dataInicio, filtros.dataFim] };
         }
 
-        const resultados = await this.model.findAll({
+        const resultados = await db.RelatorioFluxoDiario.findAll({
             where: where,
             attributes: [
                 'equipamentoId',
-                [db.sequelize.fn('COUNT', db.sequelize.col('Fluxo.id')), 'totalFluxos']
+                [db.sequelize.cast(db.sequelize.fn('SUM', db.sequelize.col('total')), 'UNSIGNED'), 'totalFluxos']
             ],
             include: [
                 {
@@ -102,7 +97,7 @@ class FluxoService extends BaseCrudService{
                     attributes: ['id', 'codigo', 'faixa']
                 }
             ],
-            group: ['Fluxo.equipamentoId', 'Equipamento.id', 'Equipamento.codigo', 'Equipamento.faixa'],
+            group: ['RelatorioFluxoDiario.equipamentoId', 'Equipamento.id', 'Equipamento.codigo', 'Equipamento.faixa'],
             order: [[db.sequelize.literal('totalFluxos'), 'DESC']]
         });
 

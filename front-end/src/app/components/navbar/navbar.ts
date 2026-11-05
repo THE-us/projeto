@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { LoginService } from '../../views/login/services/login.service';
 
@@ -11,15 +11,36 @@ import { LoginService } from '../../views/login/services/login.service';
 export class NavbarComponent implements OnInit {
   exibirNavbar = false;
   menuAberto = false;
+  usuarioLogado: { nome: string; login: string } | null = null;
 
   constructor(
     public router: Router,
-    private loginService: LoginService
+    private loginService: LoginService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
     this.loginService.authStatus$.subscribe(status => {
       this.exibirNavbar = status;
+      if (status) {
+        this.carregarUsuarioLogado();
+      } else {
+        this.usuarioLogado = null;
+      }
+    });
+  }
+
+  carregarUsuarioLogado(): void {
+    this.loginService.buscarUsuarioLogado().subscribe({
+      next: (usuario) => {
+        this.usuarioLogado = usuario;
+        this.cdr.detectChanges();
+      },
+      error: (erro) => {
+        console.error('Erro ao carregar o usuário logado:', erro);
+        this.usuarioLogado = null;
+        this.cdr.detectChanges();
+      }
     });
   }
 

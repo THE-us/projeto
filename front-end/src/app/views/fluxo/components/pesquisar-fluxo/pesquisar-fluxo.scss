@@ -1,0 +1,81 @@
+.resumo-pesquisa {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+
+  .resumo-total {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-right: 10px;
+    color: #2c3e50;
+    font-size: 15px;
+  }
+
+  .filtro-tag {
+    padding: 4px 10px;
+    background-color: #eaf6fb;
+    border: 1px solid #c8e6f3;
+    border-radius: 12px;
+    color: #2980b9;
+    font-size: 13px;
+  }
+}
+
+.velocidade-acima {
+  color: #c0392b;
+  font-weight: bold;
+}
+
+.selo-limite {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 2px 8px;
+  background-color: #fdecea;
+  border-radius: 10px;
+  color: #c0392b;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.coluna-local {
+  color: #7f8c8d;
+  font-size: 13px;
+}
+
+.lista-placas {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 12px;
+}
+
+.placa-atalho {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 12px 15px;
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  text-align: left;
+
+  &:hover:not([disabled]) {
+    border-color: #5bc0de;
+    background-color: #eaf6fb;
+  }
+
+  .placa-numero {
+    font-size: 16px;
+    font-weight: 700;
+    color: #2c3e50;
+    letter-spacing: 1px;
+  }
+
+  .placa-total {
+    font-size: 12px;
+    color: #7f8c8d;
+  }
+}

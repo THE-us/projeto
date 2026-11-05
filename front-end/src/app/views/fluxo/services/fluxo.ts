@@ -33,6 +33,18 @@ export class FluxoService {
     return this.http.get<any[]>(`${this.baseUrl}/analisar`, { params });
   }
 
+  veiculosMaisFrequentes(limite: number = 5): Observable<any[]> {
+    const params = new HttpParams().set('limite', limite.toString());
+    return this.http.get<any[]>(`${this.baseUrl}/veiculo-mais-incidentes`, { params });
+  }
+
+  equipamentosQueMaisRegistraram(placa: string, limite: number = 3): Observable<any[]> {
+    const params = new HttpParams()
+      .set('placa', placa)
+      .set('limite', limite.toString());
+    return this.http.get<any[]>(`${this.baseUrl}/equipamento-mais-analisou`, { params });
+  }
+
   exportarDados(ids: number[], formato: 'xlsx' | 'pdf', filtros: any, selecaoTotal: any = {}) {
     return this.http.post(
       `${environment.apiUrl}/exportacao/fluxos`,
